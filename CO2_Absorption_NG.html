@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CO₂ Absorption — Natural Gas Sweetening with MDEA / Sulfolane</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand-50:  #FAF6EE;
+    --sand-100: #F1E8D6;
+    --sand-200: #E5D4B5;
+    --sand-300: #D4B896;
+    --sand-400: #C9A876;
+    --sand-500: #B89A6F;
+    --tan:      #8B6F47;
+    --bronze:   #5C4830;
+    --coffee:   #3E2F1F;
+    --espresso: #2A1F14;
+    --ink:      #1A140C;
+    --feed:     #B6633A;   /* sienna - sour gas */
+    --product:  #7C9558;   /* sage green - sweet gas */
+    --solvent:  #C49340;   /* gold - amine */
+    --warn:     #B33C2A;
+    --line:     rgba(212, 184, 150, .14);
+    --line-dk:  rgba(212, 184, 150, .25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--ink);
+    color: var(--sand-50);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .serif { font-family: 'Fraunces', Georgia, serif; }
+  ::selection { background: var(--sand-400); color: var(--ink); }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOP NAV (fixed, transparent → solid on scroll)
+  ═══════════════════════════════════════════════════════════ */
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 18px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(26, 20, 12, 0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition: background .35s, backdrop-filter .35s, padding .25s, border-color .35s;
+    border-bottom: 1px solid transparent;
+  }
+  .topnav.scrolled {
+    background: rgba(26, 20, 12, .82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 14px 32px;
+    border-bottom-color: var(--line);
+  }
+  .topnav .logo {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: .25em;
+    color: var(--sand-50);
+    text-decoration: none;
+  }
+  .topnav .logo .dot { color: var(--sand-400); }
+  .topnav .nav-links { display: flex; gap: 28px; }
+  .topnav .nav-links a {
+    color: var(--sand-200);
+    font-size: .82rem; font-weight: 500;
+    letter-spacing: .04em;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .topnav .nav-links a:hover { color: var(--sand-400); }
+  .topnav .cta {
+    background: var(--sand-50);
+    color: var(--ink);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform .2s, background .2s;
+    cursor: pointer;
+  }
+  .topnav .cta:hover { transform: translateY(-1px); background: var(--sand-300); }
+  @media(max-width: 760px) {
+    .topnav { padding: 14px 18px; }
+    .topnav .nav-links { display: none; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     HERO — full screen
+  ═══════════════════════════════════════════════════════════ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 120px 24px 80px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(184, 154, 111, .28) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 30% 80%, rgba(196, 147, 64, .15) 0%, transparent 70%),
+      radial-gradient(ellipse 70% 50% at 80% 70%, rgba(124, 149, 88, .12) 0%, transparent 70%),
+      linear-gradient(180deg, #1A140C 0%, #2A1F14 50%, #3E2F1F 100%);
+    overflow: hidden;
+  }
+  /* Molecular dot pattern */
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 12% 20%,  rgba(212,184,150,.18) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 28% 65%, rgba(212,184,150,.12) 1px, transparent 1px),
+      radial-gradient(circle at 45% 30%,  rgba(212,184,150,.20) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 62% 75%, rgba(212,184,150,.14) 1px, transparent 1px),
+      radial-gradient(circle at 78% 18%, rgba(212,184,150,.18) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 88% 55%, rgba(212,184,150,.12) 1px, transparent 1px),
+      radial-gradient(circle at 18% 85%, rgba(212,184,150,.16) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 55% 92%, rgba(212,184,150,.10) 1px, transparent 1px);
+    background-size: 320px 320px;
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 1000px; }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .25em;
+    text-transform: uppercase;
+    color: var(--sand-300);
+    padding: 8px 18px;
+    border: 1px solid var(--line-dk);
+    border-radius: 999px;
+    margin-bottom: 36px;
+    backdrop-filter: blur(8px);
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.6rem, 9vw, 6rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -.02em;
+    margin-bottom: 28px;
+    color: var(--sand-50);
+  }
+  .hero h1 em {
+    font-style: italic;
+    background: linear-gradient(120deg, #D4B896 0%, #F1E8D6 50%, #C49340 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2.2vw, 1.18rem);
+    color: var(--sand-200);
+    max-width: 640px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 80px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-size: .92rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform .2s, background .2s, border-color .2s;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--sand-50);
+    color: var(--ink);
+  }
+  .btn-primary:hover { background: var(--sand-300); transform: translateY(-2px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--sand-50);
+    border-color: var(--line-dk);
+  }
+  .btn-ghost:hover { border-color: var(--sand-400); color: var(--sand-400); transform: translateY(-2px); }
+
+  /* Scroll indicator */
+  .scroll-cue {
+    position: absolute;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    color: var(--sand-300);
+    font-size: .7rem;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .scroll-cue::after {
+    content: '';
+    display: block;
+    width: 1px; height: 36px;
+    background: linear-gradient(180deg, var(--sand-400) 0%, transparent 100%);
+    margin: 10px auto 0;
+    animation: scrollPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%   { transform: scaleY(.4); transform-origin: top; opacity: .4; }
+    50%  { transform: scaleY(1);  opacity: 1; }
+    100% { transform: scaleY(.4); transform-origin: bottom; opacity: .4; }
+  }
+
+  /* Hero stats row */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 30px;
+    border-top: 1px solid var(--line-dk);
+  }
+  .hstat { text-align: center; padding: 8px; }
+  .hstat-val {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    color: var(--sand-50);
+    letter-spacing: -.02em;
+    line-height: 1;
+  }
+  .hstat-lbl {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: var(--sand-300);
+    margin-top: 8px;
+    font-weight: 500;
+  }
+  @media(max-width: 720px) {
+    .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTIONS
+  ═══════════════════════════════════════════════════════════ */
+  section {
+    padding: 110px 24px;
+    position: relative;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  .sec-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .3em;
+    color: var(--sand-400);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .sec-h {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    margin-bottom: 24px;
+    color: var(--sand-50);
+    max-width: 800px;
+  }
+  .sec-h em {
+    font-style: italic;
+    color: var(--sand-400);
+  }
+  .sec-intro {
+    font-size: 1.05rem;
+    color: var(--sand-200);
+    max-width: 680px;
+    margin-bottom: 56px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     PROCESS / STEPS (Starfield numbered grid)
+  ═══════════════════════════════════════════════════════════ */
+  #process {
+    background: linear-gradient(180deg, #3E2F1F 0%, #2A1F14 100%);
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line-dk);
+    border-top: 1px solid var(--line-dk);
+    border-bottom: 1px solid var(--line-dk);
+    margin: 0 -24px;
+  }
+  .step {
+    background: linear-gradient(180deg, rgba(62,47,31,.6) 0%, rgba(42,31,20,.6) 100%);
+    padding: 50px 32px 44px;
+    transition: background .3s;
+  }
+  .step:hover { background: linear-gradient(180deg, rgba(92,72,48,.5) 0%, rgba(62,47,31,.5) 100%); }
+  .step-num {
+    font-family: 'Fraunces', serif;
+    font-size: 3.2rem;
+    font-weight: 800;
+    color: var(--sand-400);
+    line-height: 1;
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+  .step-h {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--sand-50);
+    margin-bottom: 14px;
+    line-height: 1.25;
+  }
+  .step-body {
+    font-size: .92rem;
+    color: var(--sand-200);
+    line-height: 1.7;
+    margin-bottom: 18px;
+    font-weight: 300;
+  }
+  .step-meta {
+    font-size: .72rem;
+    color: var(--sand-400);
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    font-weight: 600;
+  }
+  @media(max-width: 900px) { .steps { grid-template-columns: 1fr 1fr; } }
+  @media(max-width: 600px) { .steps { grid-template-columns: 1fr; } }
+
+  /* ═══════════════════════════════════════════════════════════
+     PFD section
+  ═══════════════════════════════════════════════════════════ */
+  #pfd { background: var(--coffee); }
+  .pfd-card {
+    background: linear-gradient(180deg, var(--sand-50) 0%, var(--sand-100) 100%);
+    border-radius: 24px;
+    padding: 32px 24px;
+    border: 1px solid var(--sand-300);
+    box-shadow: 0 30px 60px rgba(0,0,0,.4);
+  }
+  .pfd-svg { width: 100%; height: auto; display: block; }
+  .pfd-caption {
+    margin-top: 18px;
+    color: var(--bronze);
+    font-size: .82rem;
+    line-height: 1.6;
+  }
+  .pfd-caption b { color: var(--coffee); }
+
+  /* ═══════════════════════════════════════════════════════════
+     KPI / METRIC CARDS
+  ═══════════════════════════════════════════════════════════ */
+  #metrics {
+    background: linear-gradient(180deg, #3E2F1F 0%, #5C4830 100%);
+  }
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .metric {
+    background: rgba(250, 246, 238, .04);
+    border: 1px solid var(--line-dk);
+    border-radius: 18px;
+    padding: 28px 26px;
+    backdrop-filter: blur(8px);
+    transition: transform .3s, background .3s, border-color .3s;
+  }
+  .metric:hover {
+    transform: translateY(-3px);
+    background: rgba(250, 246, 238, .08);
+    border-color: var(--sand-400);
+  }
+  .metric-label {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .18em;
+    color: var(--sand-300);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .metric-val {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--sand-50);
+    line-height: 1;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+  }
+  .metric-unit {
+    font-size: .82rem;
+    color: var(--sand-200);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CHARTS section (light)
+  ═══════════════════════════════════════════════════════════ */
+  #charts { background: var(--sand-50); color: var(--ink); }
+  #charts .sec-label { color: var(--tan); }
+  #charts .sec-h { color: var(--coffee); }
+  #charts .sec-h em { color: var(--tan); }
+  #charts .sec-intro { color: var(--bronze); }
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media(max-width: 820px) { .chart-grid { grid-template-columns: 1fr; } }
+  .chart-card {
+    background: white;
+    border: 1px solid var(--sand-200);
+    border-radius: 18px;
+    padding: 26px 24px 22px;
+    box-shadow: 0 4px 18px rgba(60, 40, 20, .04);
+  }
+  .chart-h {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--coffee);
+    margin-bottom: 4px;
+    letter-spacing: -.01em;
+  }
+  .chart-sub { font-size: .82rem; color: var(--bronze); margin-bottom: 16px; line-height: 1.5; }
+  .chart-wrap { position: relative; height: 280px; }
+  .chart-wrap.tall { height: 360px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     CALCULATIONS section
+  ═══════════════════════════════════════════════════════════ */
+  #calculations { background: var(--ink); }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+  }
+  @media(max-width: 820px) { .calc-grid { grid-template-columns: 1fr; } }
+  .calc-card {
+    background: linear-gradient(180deg, rgba(62,47,31,.6) 0%, rgba(42,31,20,.6) 100%);
+    border: 1px solid var(--line-dk);
+    border-radius: 22px;
+    padding: 32px 30px;
+    transition: border-color .3s, transform .3s;
+  }
+  .calc-card:hover { border-color: var(--sand-400); transform: translateY(-3px); }
+  .calc-tag {
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    font-style: italic;
+    color: var(--sand-400);
+    margin-bottom: 10px;
+  }
+  .calc-h {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--sand-50);
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+  .calc-body { font-size: .92rem; color: var(--sand-200); line-height: 1.7; font-weight: 300; }
+  .calc-body b { color: var(--sand-50); font-weight: 600; }
+  .eq {
+    display: block;
+    background: rgba(26,20,12,.6);
+    border-left: 3px solid var(--sand-400);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: .82rem;
+    color: var(--sand-300);
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  .eq b { color: var(--sand-50); font-family: inherit; }
+
+  /* ═══════════════════════════════════════════════════════════
+     VALIDATION (light) with tables
+  ═══════════════════════════════════════════════════════════ */
+  #validation { background: var(--sand-50); color: var(--ink); }
+  #validation .sec-label { color: var(--tan); }
+  #validation .sec-h { color: var(--coffee); }
+  #validation .sec-h em { color: var(--tan); }
+  #validation .sec-intro { color: var(--bronze); }
+  .vc-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+  .vc-card {
+    background: white;
+    border: 1px solid var(--sand-200);
+    border-radius: 18px;
+    padding: 26px 24px;
+  }
+  .vc-h {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--coffee);
+    margin-bottom: 4px;
+  }
+  .vc-sub { font-size: .85rem; color: var(--bronze); margin-bottom: 16px; }
+  .data-table { width: 100%; border-collapse: collapse; font-size: .87rem; color: var(--coffee); }
+  .data-table th {
+    padding: 11px 14px; text-align: left;
+    background: var(--coffee); color: var(--sand-50);
+    font-weight: 600; font-size: .78rem;
+    letter-spacing: .03em;
+  }
+  .data-table th:first-child { border-radius: 8px 0 0 0; }
+  .data-table th:last-child  { border-radius: 0 8px 0 0; }
+  .data-table td { padding: 10px 14px; border-bottom: 1px solid var(--sand-200); }
+  .data-table tr:nth-child(even) td { background: #FCFAF6; }
+  .data-table td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  .data-table td.product-cell { font-weight: 700; color: var(--product); background: #F0F4E5 !important; }
+  .scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+  .badge-good {
+    display: inline-block;
+    background: #E8F0D5;
+    color: #4D6629;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SAFETY section
+  ═══════════════════════════════════════════════════════════ */
+  #safety {
+    background: linear-gradient(180deg, var(--ink) 0%, var(--espresso) 100%);
+  }
+  .hz-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media(max-width: 820px) { .hz-grid { grid-template-columns: 1fr; } }
+  .hz {
+    background: rgba(179, 60, 42, .06);
+    border: 1px solid rgba(179, 60, 42, .25);
+    border-left: 4px solid var(--warn);
+    border-radius: 14px;
+    padding: 22px 24px;
+    transition: transform .25s, background .25s;
+  }
+  .hz:hover { background: rgba(179, 60, 42, .12); transform: translateX(3px); }
+  .hz-h { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: var(--sand-50); margin-bottom: 6px; }
+  .hz-cause { font-size: .82rem; color: var(--sand-300); font-style: italic; margin-bottom: 12px; }
+  .hz-safe { font-size: .87rem; color: var(--sand-100); line-height: 1.65; font-weight: 300; }
+  .hz-safe b { color: var(--sand-400); font-weight: 600; }
+
+  .layers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .layer {
+    background: rgba(250, 246, 238, .04);
+    border: 1px solid var(--line-dk);
+    border-radius: 14px;
+    padding: 22px 18px;
+    text-align: center;
+  }
+  .layer-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: .78rem;
+    color: var(--sand-400);
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .layer-icon { font-size: 28px; margin-bottom: 8px; }
+  .layer-txt { font-size: .82rem; color: var(--sand-200); line-height: 1.5; font-weight: 300; }
+
+  /* ═══════════════════════════════════════════════════════════
+     TEAM section
+  ═══════════════════════════════════════════════════════════ */
+  #team {
+    background: linear-gradient(180deg, var(--espresso) 0%, var(--ink) 100%);
+    text-align: center;
+  }
+  #team .sec-h, #team .sec-intro { margin-left: auto; margin-right: auto; }
+  #team .sec-intro { text-align: center; }
+  .mentor-block {
+    background: rgba(196, 147, 64, .06);
+    border: 1px solid rgba(196, 147, 64, .2);
+    border-radius: 18px;
+    padding: 28px 24px;
+    max-width: 580px;
+    margin: 0 auto 50px;
+  }
+  .mentor-tag {
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .3em;
+    color: var(--sand-400);
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .mentor-row { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; }
+  .mentor-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--sand-50);
+  }
+  .mentor-title {
+    font-size: .8rem;
+    color: var(--sand-300);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .mentor-name a, .member a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s, color .2s;
+  }
+  .mentor-name a:hover, .member a:hover { color: var(--sand-400); border-bottom-color: var(--sand-400); }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  @media(max-width: 900px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media(max-width: 560px) { .team-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; } }
+
+  .member {
+    text-align: center;
+  }
+  .avatar {
+    width: 84px; height: 84px; border-radius: 50%;
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--coffee);
+    background: linear-gradient(135deg, var(--sand-300) 0%, var(--sand-500) 100%);
+    border: 2px solid var(--sand-400);
+    transition: transform .3s, border-color .3s;
+  }
+  .member:hover .avatar { transform: scale(1.05); border-color: var(--sand-50); }
+  .member-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--sand-50);
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .member-role {
+    font-size: .72rem;
+    color: var(--sand-300);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CONCLUSION CTA
+  ═══════════════════════════════════════════════════════════ */
+  #conclusion {
+    background: var(--ink);
+    text-align: center;
+  }
+  #conclusion .sec-h { margin: 0 auto 24px; }
+  #conclusion .sec-intro { margin: 0 auto 40px; text-align: center; }
+  .conc-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px 0;
+    border-top: 1px solid var(--line-dk);
+    border-bottom: 1px solid var(--line-dk);
+  }
+  @media(max-width: 600px) { .conc-stats { grid-template-columns: 1fr; gap: 22px; } }
+  .conc-stat { text-align: center; }
+  .conc-val {
+    font-family: 'Fraunces', serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--sand-50);
+    letter-spacing: -.02em;
+  }
+  .conc-lbl {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: var(--sand-300);
+    margin-top: 6px;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 24px 28px;
+    background: var(--ink);
+    border-top: 1px solid var(--line-dk);
+    color: var(--sand-300);
+    font-size: .8rem;
+  }
+  footer .ft-brand {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--sand-50);
+    font-size: .92rem;
+    margin-bottom: 6px;
+  }
+  footer .ft-meta {
+    margin-top: 14px;
+    font-size: .72rem;
+    color: var(--sand-400);
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SCROLL REVEAL
+  ═══════════════════════════════════════════════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity .8s ease, transform .8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* References (compact) */
+  .refs-list {
+    list-style: none;
+    columns: 2;
+    column-gap: 36px;
+    font-size: .82rem;
+    color: var(--sand-200);
+    line-height: 1.55;
+  }
+  @media(max-width: 720px) { .refs-list { columns: 1; } }
+  .refs-list li {
+    break-inside: avoid;
+    margin-bottom: 12px;
+    padding-left: 22px;
+    position: relative;
+  }
+  .refs-list li::before {
+    content: counter(refs) ".";
+    counter-increment: refs;
+    position: absolute; left: 0; top: 0;
+    color: var(--sand-400);
+    font-weight: 700;
+  }
+  .refs-list { counter-reset: refs; }
+  .refs-list a { color: var(--sand-400); text-decoration: none; word-break: break-all; }
+  .refs-list a:hover { color: var(--sand-50); }
+  #refs { background: var(--coffee); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOP NAV
+═══════════════════════════════════════════════════════════ -->
+<nav class="topnav" id="topnav">
+  <a href="#hero" class="logo">CO<span class="dot">·</span>2 ABSORPTION</a>
+  <div class="nav-links">
+    <a href="#process">Process</a>
+    <a href="#metrics">Metrics</a>
+    <a href="#calculations">Design</a>
+    <a href="#safety">Safety</a>
+    <a href="#team">Team</a>
+  </div>
+  <a href="#conclusion" class="cta">Conclusion</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <div class="hero-tag">CHE 306 · Process Design Project · 2026</div>
+    <h1>Sour Gas In.<br><em>Sweet Gas Out.</em></h1>
+    <p class="hero-sub">An engineering design and analysis of an MDEA / Sulfolane absorption unit treating 500 kmol/h of sour natural gas — validated against Aspen HYSYS V14 to within 0.06%.</p>
+    <div class="hero-ctas">
+      <a href="#process" class="btn btn-primary">See How It Works ↓</a>
+      <a href="#team" class="btn btn-ghost">Meet the Team</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="hstat-val">45 → 2.94<span style="font-size:.6em">%</span></div>
+        <div class="hstat-lbl">CO₂ Reduction</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">~0<span style="font-size:.6em">%</span></div>
+        <div class="hstat-lbl">H₂S in Sweet Gas</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">30 / 25</div>
+        <div class="hstat-lbl">Absorber / Stripper Stages</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-val">~15 m</div>
+        <div class="hstat-lbl">Packed Bed Height</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue">Scroll</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PROCESS / HOW IT WORKS
+═══════════════════════════════════════════════════════════ -->
+<section id="process">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">How It Works</div>
+      <h2 class="sec-h">Five steps. <em>One sweetening cycle.</em></h2>
+      <p class="sec-intro">Sour gas containing 45 mol% CO₂ and 1 mol% H₂S enters at 5,200 kPa. After two columns and a regeneration loop, it leaves at pipeline-spec quality.</p>
+    </div>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-h">Sour Gas Feed</div>
+      <p class="step-body">A 500 kmol/h natural-gas stream enters the bottom of the absorber at 35 °C and 5,210 kPa. It carries 45 mol% CO₂ and 1 mol% H₂S — both must come out before the gas can enter the pipeline.</p>
+      <div class="step-meta">500 kmol/h · 5,210 kPa</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-h">Counter-Current Absorption</div>
+      <p class="step-body">In T-101's 30-stage column, MDEA + Sulfolane solvent flows down while the gas rises. CO₂ reacts chemically with MDEA; Sulfolane provides physical absorption capacity at high partial pressure.</p>
+      <div class="step-meta">30 stages · ~15 m bed</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-h">Sweet Gas Out</div>
+      <p class="step-body">Treated gas leaves the top of the absorber with CO₂ reduced from 45% to 2.94 mol% and H₂S to essentially zero — meeting pipeline specifications. Methane content rises from 52% to 93.7%.</p>
+      <div class="step-meta">CO₂ 2.94% · H₂S ≈ 0</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-h">Solvent Regeneration</div>
+      <p class="step-body">Rich amine is depressurised through the flash drum, pre-heated by the lean/rich exchanger, and stripped of acid gases in T-103's 25-stage column at 500 kPa with reboiler heat input.</p>
+      <div class="step-meta">25 stages · 500 kPa</div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-h">CO₂ Vent · Amine Recycle</div>
+      <p class="step-body">~97 kmol/h of 60% CO₂ stream is vented from the stripper top. 1,893 kmol/h of regenerated lean amine returns to the absorber, completing the cycle. Mass balance closes to 0.06%.</p>
+      <div class="step-meta">CO₂ vent · Loop closed</div>
+    </div>
+    <div class="step">
+      <div class="step-num">06</div>
+      <div class="step-h">Validated &amp; Safe</div>
+      <p class="step-body">Stage counts, balances, and compositions all match Aspen HYSYS V14 simulation. A layered protection strategy guards against H₂S toxicity, foaming, blow-by, and reboiler thermal excursion.</p>
+      <div class="step-meta">HYSYS-validated · HAZOP-ready</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PFD
+═══════════════════════════════════════════════════════════ -->
+<section id="pfd">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">Process Flow</div>
+      <h2 class="sec-h">The full <em>cycle</em>.</h2>
+      <p class="sec-intro">Sour gas enters the absorber at the bottom; sweet gas leaves the top. Rich amine flows through a flash drum and lean/rich exchanger before regeneration in the reboiled stripper.</p>
+    </div>
+
+    <div class="pfd-card reveal">
+      <svg viewBox="0 0 980 360" xmlns="http://www.w3.org/2000/svg" class="pfd-svg" role="img" aria-label="Process flow diagram">
+        <defs>
+          <linearGradient id="absGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#B89A6F"/>
+            <stop offset="100%" stop-color="#5C4830"/>
+          </linearGradient>
+          <linearGradient id="strGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#C9A876"/>
+            <stop offset="100%" stop-color="#8B6F47"/>
+          </linearGradient>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#5C4830"/>
+          </marker>
+          <marker id="arrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#7C9558"/>
+          </marker>
+          <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#B6633A"/>
+          </marker>
+        </defs>
+        <rect x="0" y="0" width="980" height="360" fill="transparent"/>
+
+        <!-- Absorber -->
+        <rect x="170" y="60" width="100" height="220" rx="8" fill="url(#absGrad)" stroke="#5C4830" stroke-width="2"/>
+        <text x="220" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#5C4830">T-101</text>
+        <text x="220" y="170" text-anchor="middle" font-size="11" font-weight="600" fill="white">ABSORBER</text>
+        <text x="220" y="186" text-anchor="middle" font-size="10" fill="white" opacity="0.9">30 stages</text>
+        <text x="220" y="200" text-anchor="middle" font-size="10" fill="white" opacity="0.9">5,200 kPa</text>
+        <line x1="180" y1="100" x2="260" y2="100" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="120" x2="260" y2="120" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="140" x2="260" y2="140" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="220" x2="260" y2="220" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="240" x2="260" y2="240" stroke="white" stroke-width=".5" opacity=".4"/>
+
+        <!-- Stripper -->
+        <rect x="640" y="60" width="100" height="220" rx="8" fill="url(#strGrad)" stroke="#5C4830" stroke-width="2"/>
+        <text x="690" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#5C4830">T-103</text>
+        <text x="690" y="170" text-anchor="middle" font-size="11" font-weight="600" fill="white">STRIPPER</text>
+        <text x="690" y="186" text-anchor="middle" font-size="10" fill="white" opacity="0.9">25 stages</text>
+        <text x="690" y="200" text-anchor="middle" font-size="10" fill="white" opacity="0.9">500 kPa</text>
+        <line x1="650" y1="100" x2="730" y2="100" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="120" x2="730" y2="120" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="140" x2="730" y2="140" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="220" x2="730" y2="220" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="240" x2="730" y2="240" stroke="white" stroke-width=".5" opacity=".4"/>
+
+        <circle cx="780" cy="295" r="22" fill="#B33C2A" stroke="#7A2418" stroke-width="2"/>
+        <text x="780" y="299" text-anchor="middle" font-size="11" font-weight="700" fill="white">Q</text>
+        <text x="780" y="335" text-anchor="middle" font-size="10" font-weight="600" fill="#7A2418">Reboiler</text>
+
+        <rect x="385" y="200" width="80" height="44" rx="4" fill="#FAF6EE" stroke="#8B6F47" stroke-width="1.5"/>
+        <text x="425" y="218" text-anchor="middle" font-size="10" font-weight="700" fill="#5C4830">Lean/Rich</text>
+        <text x="425" y="232" text-anchor="middle" font-size="10" font-weight="600" fill="#5C4830">HX</text>
+
+        <ellipse cx="350" cy="155" rx="22" ry="14" fill="#FAF6EE" stroke="#8B6F47" stroke-width="1.5"/>
+        <text x="350" y="159" text-anchor="middle" font-size="9" font-weight="700" fill="#5C4830">Flash</text>
+
+        <line x1="60" y1="260" x2="170" y2="260" stroke="#B6633A" stroke-width="2.5" marker-end="url(#arrR)"/>
+        <text x="115" y="252" text-anchor="middle" font-size="10" font-weight="600" fill="#B6633A">Sour Gas Feed</text>
+        <text x="115" y="276" text-anchor="middle" font-size="9" fill="#7A6F5E">500 kmol/h · 45% CO₂ · 1% H₂S</text>
+
+        <line x1="220" y1="60" x2="220" y2="20" stroke="#7C9558" stroke-width="2.5" marker-end="url(#arrG)"/>
+        <text x="232" y="40" font-size="10" font-weight="600" fill="#3D5424">Sweet Gas</text>
+        <text x="232" y="54" font-size="9" fill="#7A6F5E">CO₂ 2.94% · H₂S ≈ 0</text>
+
+        <line x1="270" y1="80" x2="320" y2="80" stroke="#C49340" stroke-width="2"/>
+        <line x1="320" y1="80" x2="320" y2="20" stroke="#C49340" stroke-width="2"/>
+        <text x="332" y="50" font-size="10" font-weight="600" fill="#8B6F0B">Lean Amine</text>
+        <text x="332" y="64" font-size="9" fill="#7A6F5E">1,892 kmol/h · 26 °C</text>
+
+        <line x1="270" y1="260" x2="320" y2="260" stroke="#B6633A" stroke-width="2.5"/>
+        <line x1="320" y1="260" x2="320" y2="155" stroke="#B6633A" stroke-width="2.5"/>
+        <line x1="320" y1="155" x2="328" y2="155" stroke="#B6633A" stroke-width="2.5" marker-end="url(#arrR)"/>
+        <text x="295" y="280" text-anchor="middle" font-size="10" font-weight="600" fill="#B6633A">Rich Amine</text>
+        <line x1="372" y1="155" x2="425" y2="155" stroke="#B6633A" stroke-width="2.5"/>
+        <line x1="425" y1="155" x2="425" y2="200" stroke="#B6633A" stroke-width="2.5" marker-end="url(#arrR)"/>
+        <line x1="465" y1="222" x2="540" y2="222" stroke="#B6633A" stroke-width="2.5"/>
+        <line x1="540" y1="222" x2="540" y2="100" stroke="#B6633A" stroke-width="2.5"/>
+        <line x1="540" y1="100" x2="640" y2="100" stroke="#B6633A" stroke-width="2.5" marker-end="url(#arrR)"/>
+        <text x="595" y="92" text-anchor="middle" font-size="10" font-weight="600" fill="#B6633A">Rich Solvent</text>
+
+        <line x1="690" y1="60" x2="690" y2="20" stroke="#B6633A" stroke-width="2.5" marker-end="url(#arrR)"/>
+        <text x="702" y="40" font-size="10" font-weight="600" fill="#B6633A">CO₂ Product</text>
+        <text x="702" y="54" font-size="9" fill="#7A6F5E">~97 kmol/h, 60% CO₂</text>
+
+        <line x1="740" y1="260" x2="900" y2="260" stroke="#C49340" stroke-width="2"/>
+        <line x1="900" y1="260" x2="900" y2="222" stroke="#C49340" stroke-width="2"/>
+        <line x1="900" y1="222" x2="465" y2="222" stroke="#C49340" stroke-width="2"/>
+        <text x="820" y="280" text-anchor="middle" font-size="10" font-weight="600" fill="#8B6F0B">Lean Amine Recycle (1,893 kmol/h, 70 °C)</text>
+      </svg>
+      <p class="pfd-caption"><b>Key:</b> Sienna = sour / acid-gas streams · Sage = sweet gas product · Goldenrod = amine streams. The lean/rich exchanger recovers heat to pre-heat the rich solvent before stripping.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     METRICS
+═══════════════════════════════════════════════════════════ -->
+<section id="metrics">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">By the Numbers</div>
+      <h2 class="sec-h">Key process <em>parameters</em>.</h2>
+      <p class="sec-intro">The complete operating envelope and design basis for the unit, drawn from the Aspen HYSYS V14 simulation and confirmed by independent hand calculations.</p>
+    </div>
+    <div class="metric-grid reveal">
+      <div class="metric"><div class="metric-label">Sour Gas Feed</div><div class="metric-val">500</div><div class="metric-unit">kmol/h · 35 °C · 5,210 kPa</div></div>
+      <div class="metric"><div class="metric-label">CO₂ in Feed</div><div class="metric-val">45%</div><div class="metric-unit">mol fraction</div></div>
+      <div class="metric"><div class="metric-label">H₂S in Feed</div><div class="metric-val">1%</div><div class="metric-unit">mol fraction · sour service</div></div>
+      <div class="metric"><div class="metric-label">Lean Amine Flow</div><div class="metric-val">1,892</div><div class="metric-unit">kmol/h · 26 °C · 5,220 kPa</div></div>
+      <div class="metric"><div class="metric-label">Sweet Gas CO₂</div><div class="metric-val">2.94%</div><div class="metric-unit">pipeline specification</div></div>
+      <div class="metric"><div class="metric-label">Sweet Gas H₂S</div><div class="metric-val">~0</div><div class="metric-unit">essentially complete removal</div></div>
+      <div class="metric"><div class="metric-label">Absorber P</div><div class="metric-val">5,200</div><div class="metric-unit">kPa · high-pressure operation</div></div>
+      <div class="metric"><div class="metric-label">Stripper P</div><div class="metric-val">500</div><div class="metric-unit">kPa · reboiler at ~70 °C</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHARTS (light)
+═══════════════════════════════════════════════════════════ -->
+<section id="charts">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">Streams &amp; Compositions</div>
+      <h2 class="sec-h">What's <em>actually</em> in each stream.</h2>
+      <p class="sec-intro">Component composition by mol fraction across the four key process streams, from the rigorous Acid Gas — Chemical Solvents fluid package.</p>
+    </div>
+
+    <div class="chart-card reveal" style="margin-bottom: 22px">
+      <div class="chart-h">Composition stack — sour gas, sweet gas, rich amine</div>
+      <div class="chart-sub">Stacked mol-fraction (%). Sweet gas reaches pipeline spec while CO₂ moves into the rich amine for downstream regeneration.</div>
+      <div class="chart-wrap tall"><canvas id="compChart"></canvas></div>
+    </div>
+
+    <div class="chart-grid reveal">
+      <div class="chart-card">
+        <div class="chart-h">CO₂ reduction across the absorber</div>
+        <div class="chart-sub">CO₂ mol fraction (%) — feed → rich amine → product.</div>
+        <div class="chart-wrap"><canvas id="co2Chart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-h">Hand calc vs HYSYS — sweet-gas error</div>
+        <div class="chart-sub">|Absolute error| in mol fraction. All bars below 0.001 = pipeline-grade agreement.</div>
+        <div class="chart-wrap"><canvas id="errorChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CALCULATIONS
+═══════════════════════════════════════════════════════════ -->
+<section id="calculations">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">Design Calculations</div>
+      <h2 class="sec-h">Mass. Energy. <em>Stages.</em></h2>
+      <p class="sec-intro">Independent hand calculations of mass and energy balances, Kremser equilibrium-stage analysis, and HTU/NTU packed-bed sizing — all cross-checked against the rigorous simulation.</p>
+    </div>
+
+    <div class="calc-grid reveal">
+      <div class="calc-card">
+        <div class="calc-tag">01</div>
+        <div class="calc-h">Mass balance closes to 0.06%</div>
+        <p class="calc-body">At steady state with 30 stages and zero accumulation, F<sub>SourGas</sub> + F<sub>LeanAmine</sub> = F<sub>SweetGas</sub> + F<sub>RichAmine</sub>. Hand calc and HYSYS agree exactly on a molar basis and to within 0.06% on mass.</p>
+        <div class="eq">500 + 1,893 = 226.4 + 2,166.6 = <b>2,393 kmol/h ✓</b></div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-tag">02</div>
+        <div class="calc-h">T-101 runs adiabatically</div>
+        <p class="calc-body">Total enthalpy in equals total enthalpy out. The exothermic CO₂ absorption heat is carried out by a 6.4 °C rise in the rich-amine stream — no external cooling is required.</p>
+        <div class="eq">Q<sub>abs</sub> = ΣH<sub>out</sub> − ΣH<sub>in</sub> ≈ <b>0 kJ/h</b><br>ΔT<sub>solvent</sub> = 32.5 − 26.1 = <b>6.4 °C</b></div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-tag">03</div>
+        <div class="calc-h">Kremser absorber → 30 stages</div>
+        <p class="calc-body">Solute-free mole ratios with effective slope m = 6.945 (back-fitted to Aspen's rigorous VLE). Absorption factor A = 0.991 — just above the theoretical minimum solvent rate.</p>
+        <div class="eq">Y<sub>N+1</sub>/Y<sub>1</sub> = 0.8182 / 0.03029 = 27.0<br>A = L/(m·V<sub>s</sub>) = 1,892/(6.945·275) = <b>0.991</b><br>⇒ <b>N ≈ 30 ✓</b></div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-tag">04</div>
+        <div class="calc-h">Kremser stripper → 25 stages</div>
+        <p class="calc-body">Apparent slope m = 12.55 reflects the steep desorption curve. Stripping factor S = 1.244 confirms vapour as the favoured phase for CO₂.</p>
+        <div class="eq">S = m·V/L = (12.55·200)/2,018 = <b>1.244</b><br>x<sub>in</sub>/x<sub>out</sub> = 0.0599/0.00005 = 1,198<br>⇒ <b>N ≈ 25 ✓</b></div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-tag">05</div>
+        <div class="calc-h">HTU / NTU → ~15 m bed</div>
+        <p class="calc-body">Sulzer Mellapak 250Y structured packing. Both columns converge to ~15 m of packed bed — a reasonable preliminary value for an MDEA / Sulfolane sweetening service.</p>
+        <div class="eq">Absorber: NTU 30.2 · HTU 0.50 m → <b>H ≈ 15.0 m</b><br>Stripper: NTU 22.4 · HTU 0.67 m → <b>H ≈ 15.0 m</b></div>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-tag">06</div>
+        <div class="calc-h">Solvent system: hybrid by design</div>
+        <p class="calc-body"><b>MDEA</b> provides selective chemical absorption with low regeneration energy and low corrosion tendency. <b>Sulfolane</b> adds physical absorption capacity at the high CO₂ partial pressure of the feed. Together: high removal, manageable reboiler duty.</p>
+        <div class="eq"><b>MDEA</b> 33.9% · <b>Sulfolane</b> 34.0% · <b>H₂O</b> 21.2% · CO₂ 10.2%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     VALIDATION (light)
+═══════════════════════════════════════════════════════════ -->
+<section id="validation">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">Validation</div>
+      <h2 class="sec-h">Hand calcs vs. <em>HYSYS V14</em>.</h2>
+      <p class="sec-intro">Independent hand calculations, sanity-checked against the rigorous Aspen HYSYS V14 simulation. Across composition, mass, energy, and stage count, agreement is within rounding error.</p>
+    </div>
+
+    <div class="vc-grid reveal">
+      <div class="vc-card">
+        <div class="vc-h">Sweet gas composition <span class="badge-good">All ≤ 0.001 |error|</span></div>
+        <div class="vc-sub">Mol-fraction comparison per component.</div>
+        <div class="scroll-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Component</th><th class="num">HYSYS x</th><th class="num">Hand calc x</th><th class="num">|Error|</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>CO₂</b></td><td class="num">0.0294</td><td class="num">0.0300</td><td class="num">0.0006</td></tr>
+              <tr><td>H₂S</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.0000</td></tr>
+              <tr><td>Methane</td><td class="num">0.9368</td><td class="num">0.9360</td><td class="num">0.0008</td></tr>
+              <tr><td>Ethane</td><td class="num">0.0256</td><td class="num">0.0260</td><td class="num">0.0004</td></tr>
+              <tr><td>Propane</td><td class="num">0.0080</td><td class="num">0.0080</td><td class="num">0.0000</td></tr>
+              <tr><td>H₂O</td><td class="num">0.0002</td><td class="num">0.0000</td><td class="num">0.0002</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="vc-card">
+        <div class="vc-h">CO₂ product (stripper overhead) <span class="badge-good">≤ 0.005 |error|</span></div>
+        <div class="vc-sub">Compositions of the regenerated CO₂ stream from T-103.</div>
+        <div class="scroll-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Component</th><th class="num">HYSYS x</th><th class="num">Hand calc x</th><th class="num">|Error|</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>CO₂</b></td><td class="num">0.6048</td><td class="num">0.6000</td><td class="num">0.0048</td></tr>
+              <tr><td>H₂S</td><td class="num">0.0243</td><td class="num">0.0250</td><td class="num">0.0007</td></tr>
+              <tr><td>H₂O</td><td class="num">0.3698</td><td class="num">0.3741</td><td class="num">0.0043</td></tr>
+              <tr><td>Methane</td><td class="num">0.0005</td><td class="num">0.0005</td><td class="num">0.0000</td></tr>
+              <tr><td>Ethane</td><td class="num">0.0002</td><td class="num">0.0002</td><td class="num">0.0000</td></tr>
+              <tr><td>MDEAmine</td><td class="num">0.0002</td><td class="num">0.0000</td><td class="num">0.0002</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="vc-card">
+        <div class="vc-h">Stage-count match <span class="badge-good">Both columns exact</span></div>
+        <div class="vc-sub">Kremser shortcut vs Aspen HYSYS rigorous.</div>
+        <div class="scroll-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Column</th><th>Method</th><th class="num">N</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><b>T-101 Absorber</b></td><td>Kremser (m = 6.945, solute-free)</td><td class="num">~30</td><td>✔ matches</td></tr>
+              <tr><td><b>T-101 Absorber</b></td><td>Aspen HYSYS rigorous</td><td class="num">30</td><td>Reference</td></tr>
+              <tr><td><b>T-103 Stripper</b></td><td>Kremser (m = 12.55)</td><td class="num">~25</td><td>✔ matches</td></tr>
+              <tr><td><b>T-103 Stripper</b></td><td>Aspen HYSYS rigorous</td><td class="num">25</td><td>Reference</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SAFETY
+═══════════════════════════════════════════════════════════ -->
+<section id="safety">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">Safety Evaluation</div>
+      <h2 class="sec-h">Sour service, <em>layered defence</em>.</h2>
+      <p class="sec-intro">High-pressure sour service introduces toxicity, asphyxiation, flammability, corrosion, and process-upset hazards. Each is paired with a preventive and protective layer — from inherent safety up to flare routing.</p>
+    </div>
+
+    <div class="hz-grid reveal">
+      <div class="hz">
+        <div class="hz-h">☠️ H₂S Toxic Release</div>
+        <div class="hz-cause">Leak from absorber, flash drum, stripper overhead, sample point or rich-amine line</div>
+        <div class="hz-safe"><b>Safeguards:</b> Fixed H₂S detectors (10 / 20 ppm alarms), portable detectors, permit-to-work, escape SCBA, closed sampling, vent routing to flare.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">😶‍🌫️ CO₂ Asphyxiation</div>
+        <div class="hz-cause">CO₂-rich vent or leak displacing oxygen in low-lying / enclosed areas</div>
+        <div class="hz-safe"><b>Safeguards:</b> Stripper overhead routed to safe-elevation stack with adequate dispersion · oxygen monitoring in adjacent enclosed areas.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">🔥 Methane Fire / Explosion</div>
+        <div class="hz-cause">Sweet-gas leak mixing with air within the flammable range</div>
+        <div class="hz-safe"><b>Safeguards:</b> Hydrocarbon detectors · hazardous-area electrical classification · ignition-source control · grounding · N₂ purge at startup.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">🧱 Sulfide Stress Cracking / HIC</div>
+        <div class="hz-cause">Wet H₂S hydrogen damage near welds — cf. Union Oil Romeoville absorber rupture (OSHA 1986)</div>
+        <div class="hz-safe"><b>Safeguards:</b> Sour-service material selection · HIC-resistant plate · post-weld heat treatment · hardness control · weld inspection.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">🧪 Amine Stress Corrosion Cracking</div>
+        <div class="hz-cause">Hot lean amine + residual weld stress (Bagdasarian, Shargay &amp; Coombs 1992)</div>
+        <div class="hz-safe"><b>Safeguards:</b> Stress-relieved welds in lean-amine and stripper service · lean-amine temperature control · inspection of hot-amine circuits.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">💧 Erosion-Corrosion at Letdown</div>
+        <div class="hz-cause">Two-phase flashing flow downstream of rich-amine pressure-reducing valve</div>
+        <div class="hz-safe"><b>Safeguards:</b> Stainless / hard-faced trim · velocity control · corrosion monitoring · scheduled inspection.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">🫧 Foaming &amp; Carryover</div>
+        <div class="hz-cause">Hydrocarbon contamination, FeS solids, degradation products, heat-stable salts</div>
+        <div class="hz-safe"><b>Safeguards:</b> Inlet separation · coalescing filtration · solvent analysis · high-DP alarms · controlled antifoam (root-cause fix).</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">⬆️ Gas Blow-By to Flash Drum</div>
+        <div class="hz-cause">Loss of absorber bottom level exposing flash drum to absorber pressure</div>
+        <div class="hz-safe"><b>Safeguards:</b> Low-low level interlock · PSV sized for blow-by · relief to closed flare per API 521.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">🔥 Reboiler Overheating</div>
+        <div class="hz-cause">Loss of rich-amine flow while steam continues to the reboiler</div>
+        <div class="hz-safe"><b>Safeguards:</b> Fail-closed steam valve · low-low flow trip · low-low level trip · high-temperature trip.</div>
+      </div>
+      <div class="hz">
+        <div class="hz-h">🚨 Acid-Gas Breakthrough</div>
+        <div class="hz-cause">Loss of lean-amine circulation while sour gas continues to enter</div>
+        <div class="hz-safe"><b>Safeguards:</b> Low-low lean-amine flow interlock closes the sour-gas inlet ESD valve. SIL set by formal LOPA per IEC 61511.</div>
+      </div>
+    </div>
+
+    <div class="layers reveal">
+      <div class="layer"><div class="layer-num">Layer 01</div><div class="layer-icon">🌱</div><div class="layer-txt">Inherent safety<br>minimise inventory</div></div>
+      <div class="layer"><div class="layer-num">Layer 02</div><div class="layer-icon">🎛️</div><div class="layer-txt">Basic process<br>control (BPCS)</div></div>
+      <div class="layer"><div class="layer-num">Layer 03</div><div class="layer-icon">🔔</div><div class="layer-txt">Alarms &amp;<br>operator response</div></div>
+      <div class="layer"><div class="layer-num">Layer 04</div><div class="layer-icon">🛑</div><div class="layer-txt">Safety-instrumented<br>system (ESD)</div></div>
+      <div class="layer"><div class="layer-num">Layer 05</div><div class="layer-icon">🚿</div><div class="layer-txt">Pressure relief<br>+ closed flare</div></div>
+      <div class="layer"><div class="layer-num">Layer 06</div><div class="layer-icon">🚒</div><div class="layer-txt">Gas detection<br>fire / emergency</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CONCLUSION
+═══════════════════════════════════════════════════════════ -->
+<section id="conclusion">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">Final Word</div>
+      <h2 class="sec-h">A unit that <em>works</em>.</h2>
+      <p class="sec-intro">Within the scope of this CHE 306 design project, the proposed MDEA / Sulfolane absorption unit is technically feasible. It achieves strong CO₂ and H₂S removal, the mass and energy balances are consistent, and Kremser shortcut and HYSYS rigorous results agree on stage count. With rate-based validation, economic optimisation, and detailed HAZOP / LOPA, the unit can be designed for safe and effective sour natural gas sweetening.</p>
+      <div class="conc-stats">
+        <div class="conc-stat"><div class="conc-val">93.7%</div><div class="conc-lbl">CH₄ in Sweet Gas</div></div>
+        <div class="conc-stat"><div class="conc-val">~0%</div><div class="conc-lbl">H₂S Output</div></div>
+        <div class="conc-stat"><div class="conc-val">&lt; 0.06%</div><div class="conc-lbl">Balance Closure</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TEAM
+═══════════════════════════════════════════════════════════ -->
+<section id="team">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">The Team</div>
+      <h2 class="sec-h">CHE 306 · <em>2026</em>.</h2>
+      <p class="sec-intro">King Fahd University of Petroleum &amp; Minerals · Department of Chemical Engineering · Process Design Project, Spring 2026.</p>
+    </div>
+
+    <div class="mentor-block reveal">
+      <div class="mentor-tag">Supervised By</div>
+      <div class="mentor-row">
+        <div>
+          <div class="mentor-name"><a href="https://www.linkedin.com/in/abdallah-al-shammari-875b7791?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank">Dr. Abdallah Al-Shammari</a></div>
+          <div class="mentor-title">Faculty Advisor</div>
+        </div>
+        <div>
+          <div class="mentor-name"><a href="https://www.linkedin.com/in/basim-abussaud-ph-d-4b696368?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank">Dr. Basim Abussaud, Ph.D.</a></div>
+          <div class="mentor-title">Faculty Advisor</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-grid reveal">
+      <div class="member">
+        <a href="https://www.linkedin.com/in/nawaf-alzahrani-2ab194285?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank">
+          <div class="avatar">NA</div>
+          <div class="member-name">Nawaf Alzahrani</div>
+          <div class="member-role">CHE · Team Member</div>
+        </a>
+      </div>
+      <div class="member">
+        <a href="https://www.linkedin.com/in/ali-alyami-222aa3380?utm_source=share_via&utm_content=profile&utm_medium=member_" target="_blank">
+          <div class="avatar">AA</div>
+          <div class="member-name">Ali Alyami</div>
+          <div class="member-role">CHE · Team Member</div>
+        </a>
+      </div>
+      <div class="member">
+        <a href="#" target="_blank">
+          <div class="avatar">AB</div>
+          <div class="member-name">Ahmed Badrieq</div>
+          <div class="member-role">CHE · Team Member</div>
+        </a>
+      </div>
+      <div class="member">
+        <a href="https://www.linkedin.com/in/hatim-aljohani-424a39319?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank">
+          <div class="avatar">HA</div>
+          <div class="member-name">Hatim Aljohani</div>
+          <div class="member-role">CHE · Team Member</div>
+        </a>
+      </div>
+      <div class="member">
+        <a href="https://www.linkedin.com/in/saleh-alloqman-343064331?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank">
+          <div class="avatar">SA</div>
+          <div class="member-name">Saleh Alloqman</div>
+          <div class="member-role">CHE · Team Member</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     REFERENCES
+═══════════════════════════════════════════════════════════ -->
+<section id="refs">
+  <div class="container">
+    <div class="reveal">
+      <div class="sec-label">References</div>
+      <h2 class="sec-h">What we <em>read</em>.</h2>
+      <p class="sec-intro">Peer-reviewed papers, regulatory standards, textbook references, and process simulation documentation used to support this design.</p>
+    </div>
+    <ol class="refs-list reveal">
+      <li>Aspen Technology, Inc. (2023). <em>Aspen HYSYS V14 — Acid Gas / Chemical Solvents fluid package documentation.</em> AspenTech.</li>
+      <li>Kidnay, A. J., Parrish, W. R., &amp; McCartney, D. G. (2011). <em>Fundamentals of Natural Gas Processing</em> (2nd ed.). CRC Press.</li>
+      <li>Kohl, A. L., &amp; Nielsen, R. B. (1997). <em>Gas Purification</em> (5th ed.). Gulf Publishing Company.</li>
+      <li>Seader, J. D., Henley, E. J., &amp; Roper, D. K. (2011). <em>Separation Process Principles</em> (3rd ed.). Wiley.</li>
+      <li>Kremser, A. (1930). Theoretical number of plates for separation. <em>National Petroleum News, 22</em>(21), 43–49.</li>
+      <li>Farooqi, A. S. et al. (2023). Absorption of CO₂ &amp; H₂S using MDEA, AMP &amp; Sulfolane. <em>Materials Research Proceedings, 29</em>, 9–16. <a href="https://doi.org/10.21741/9781644902516-2" target="_blank">DOI</a></li>
+      <li>Nejat, T. et al. (2018). Exergy &amp; energy analysis of a sour-gas treatment plant. <em>Chem. Eng. Research &amp; Design, 133</em>, 40–54.</li>
+      <li>Ghanbarabadi, H., &amp; Khoshandam, B. (2015). Sulfinol vs amine simulation. <em>J. Nat. Gas Sci. Eng., 22</em>, 415–420.</li>
+      <li>Sarker, N. K. (2016). Theoretical effects on amine sweetening. <em>Egypt. J. Petroleum, 25</em>(3), 343–354.</li>
+      <li>Zoghi, A. T. et al. (2012). Effect of amine activators on CO₂ absorption. <em>Int. J. Greenhouse Gas Control, 7</em>, 12–19.</li>
+      <li>Bagdasarian, A. J., Shargay, C. A., &amp; Coombs, J. (1992). Amine stress corrosion cracking. <em>Oil &amp; Gas Journal, 90</em>(2), 51–57.</li>
+      <li>Stewart, E. J., &amp; Lanning, R. A. (2015). Amine system failures. <em>65th Laurance Reid Gas Conditioning Conf.</em></li>
+      <li>Krzemień, A. (2016). Risk of corrosion in amine-based CO₂ capture. <em>J. Loss Prev. Process Ind., 43</em>, 189–197.</li>
+      <li>Polasek, J., Bullin, J. A., &amp; Donnelly, S. T. (1997). Acid-gas breakout in amine units. <em>Bryan Research Tech. Paper.</em></li>
+      <li>NIOSH (2019). <em>Pocket guide to chemical hazards: Hydrogen sulfide.</em> DHHS-NIOSH 2005-149. <a href="https://www.cdc.gov/niosh/npg/npgd0337.html" target="_blank">link</a></li>
+      <li>OSHA (1986). <em>Union Oil Romeoville absorber rupture incident report.</em></li>
+      <li>Nielsen, R. B., &amp; Lewis, K. R. (1995). Corrosion in refinery amine systems. <em>NACE CORROSION 1995.</em></li>
+      <li>Vysus Group (2021). Heat-stable salt management in amine systems. Technical bulletin.</li>
+      <li>API Standard 521. <em>Pressure-relieving and Depressuring Systems.</em> American Petroleum Institute.</li>
+      <li>IEC 61511. <em>Functional Safety: SIS for the process industry sector.</em></li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-brand">CO₂ Absorption from Natural Gas — MDEA / Sulfolane</div>
+  Validated against Aspen HYSYS V14 · Acid Gas / Chemical Solvents
+  <div class="ft-meta">2026 · KFUPM CHE 306 · Process Design Project</div>
+</footer>
+
+<script>
+const COL = {
+  feed: '#B6633A', product: '#7C9558', solvent: '#C49340',
+  warn: '#B33C2A', tan: '#8B6F47', sand: '#D4B896',
+  bronze: '#5C4830', coffee: '#3E2F1F', accent: '#9CB575'
+};
+
+/* Top nav scroll effect */
+const topnav = document.getElementById('topnav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 30) topnav.classList.add('scrolled');
+  else topnav.classList.remove('scrolled');
+});
+
+/* Scroll-reveal */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* Charts */
+const baseOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 14, boxWidth: 12, color: '#5C4830' } } }
+};
+
+const compCtx = document.getElementById('compChart');
+if (compCtx) new Chart(compCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Sour Gas Feed', 'Sweet Gas (out)', 'Rich Amine (out)'],
+    datasets: [
+      { label: 'CO₂',      data: [45.0, 2.94, 10.23], backgroundColor: COL.feed,    borderRadius: 4 },
+      { label: 'H₂S',      data: [1.0,  0.0,  0.24],  backgroundColor: COL.warn,    borderRadius: 4 },
+      { label: 'Methane',  data: [52.0, 93.68, 0.31], backgroundColor: COL.product, borderRadius: 4 },
+      { label: 'Ethane',   data: [1.5,  2.56,  0.03], backgroundColor: COL.sand,    borderRadius: 4 },
+      { label: 'Propane',  data: [0.5,  0.80,  0.02], backgroundColor: COL.accent,  borderRadius: 4 },
+      { label: 'MDEA',     data: [0,    0,    33.89], backgroundColor: COL.solvent, borderRadius: 4 },
+      { label: 'H₂O',      data: [0,    0.02, 21.22], backgroundColor: '#7AAFC9',   borderRadius: 4 },
+      { label: 'Sulfolane',data: [0,    0,    33.98], backgroundColor: COL.bronze,  borderRadius: 4 }
+    ]
+  },
+  options: {
+    ...baseOpts,
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { color: '#5C4830' } },
+      y: { stacked: true, max: 100, ticks: { callback: v => v + '%', color: '#5C4830' }, title: { display: true, text: 'mol fraction (%)', color: '#5C4830' } }
+    },
+    plugins: {
+      ...baseOpts.plugins,
+      tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y.toFixed(2)}%` } }
+    }
+  }
+});
+
+const co2Ctx = document.getElementById('co2Chart');
+if (co2Ctx) new Chart(co2Ctx, {
+  type: 'bar',
+  data: {
+    labels: ['Sour Gas Feed', 'Rich Amine', 'Sweet Gas Product'],
+    datasets: [{
+      label: 'CO₂ (%)',
+      data: [45.0, 10.23, 2.94],
+      backgroundColor: [COL.feed, COL.solvent, COL.product],
+      borderRadius: 6
+    }]
+  },
+  options: {
+    ...baseOpts,
+    indexAxis: 'y',
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.x + '%' } } },
+    scales: {
+      x: { title: { display: true, text: 'CO₂ mol fraction (%)', color: '#5C4830' }, ticks: { callback: v => v + '%', color: '#5C4830' }, grid: { color: 'rgba(139,111,71,.08)' } },
+      y: { grid: { display: false }, ticks: { color: '#5C4830' } }
+    }
+  }
+});
+
+const errCtx = document.getElementById('errorChart');
+if (errCtx) new Chart(errCtx, {
+  type: 'bar',
+  data: {
+    labels: ['CO₂','H₂S','Ethane','Methane','Propane','H₂O'],
+    datasets: [{
+      label: '|error|',
+      data: [0.0006, 0.0000, 0.0004, 0.0008, 0.0000, 0.0002],
+      backgroundColor: COL.product,
+      borderRadius: 4
+    }]
+  },
+  options: {
+    ...baseOpts,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => '|err| = ' + c.parsed.y.toFixed(4) } } },
+    scales: {
+      y: { beginAtZero: true, max: 0.001, title: { display: true, text: '|error| (mol fraction)', color: '#5C4830' }, ticks: { color: '#5C4830' }, grid: { color: 'rgba(139,111,71,.08)' } },
+      x: { grid: { display: false }, ticks: { color: '#5C4830' } }
+    }
+  }
+});
+</script>
+</body>
+</html>

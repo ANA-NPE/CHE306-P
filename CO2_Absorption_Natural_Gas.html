@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CO₂ Absorption from Natural Gas — MDEA / Sulfolane Process Design</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    /* Warm sand / beige palette */
+    --primary:    #8B6F47;   /* warm bronze brown - main accent */
+    --primary-dk: #5C4830;   /* deep coffee */
+    --primary-lt: #B89A6F;   /* light tan */
+    --accent:     #C9A876;   /* gold beige */
+    --accent-2:   #D4B896;   /* lighter gold */
+
+    /* Process category colors (warm tones) */
+    --feed:       #A0522D;   /* sienna - sour gas */
+    --product:    #6B8E4E;   /* sage green - sweet gas */
+    --solvent:    #B8860B;   /* dark goldenrod - amine */
+    --warn:       #C0392B;   /* warm red - hazards */
+
+    --bg:         #FAF7F2;   /* warm off-white */
+    --bg-alt:     #F4EFE6;   /* sand */
+    --card:       #FFFFFF;
+    --border:     #E5DCC9;
+    --border-dk:  #C9B998;
+    --text:       #2A2520;
+    --muted:      #7A6F5E;
+    --primary-lt-bg: #F5EDDD;
+    --green:      #6B8E4E;
+    --greenl:     #EBF1E0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     HERO
+  ═══════════════════════════════════════════════════════════ */
+  .hero {
+    position: relative;
+    background:
+      radial-gradient(ellipse at top right, rgba(212, 184, 150, .35) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom left, rgba(184, 154, 111, .3) 0%, transparent 50%),
+      linear-gradient(160deg, #3E2F1F 0%, #5C4830 35%, #8B6F47 70%, #A88864 100%);
+    color: #FAF6EE;
+    padding: 56px 22px 70px;
+    overflow: hidden;
+  }
+  /* Subtle molecular dot pattern */
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 8% 12%,  rgba(255,243,220,.08) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 18% 30%, rgba(255,243,220,.07) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 32% 8%,  rgba(255,243,220,.06) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 44% 22%, rgba(255,243,220,.07) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 58% 38%, rgba(255,243,220,.08) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 70% 14%, rgba(255,243,220,.06) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 84% 28%, rgba(255,243,220,.08) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 92% 48%, rgba(255,243,220,.07) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 12% 60%, rgba(255,243,220,.07) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 26% 78%, rgba(255,243,220,.08) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 50% 70%, rgba(255,243,220,.06) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 76% 86%, rgba(255,243,220,.07) 1.5px, transparent 1.5px),
+      radial-gradient(circle at 90% 72%, rgba(255,243,220,.08) 1.5px, transparent 1.5px);
+    background-size: 240px 240px;
+    pointer-events: none;
+    opacity: .9;
+  }
+  .hero-inner { position: relative; max-width: 720px; margin: 0 auto; text-align: center; }
+
+  .hero-pill-top {
+    display: inline-block;
+    background: rgba(255,243,220,.10);
+    border: 1px solid rgba(255,243,220,.26);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 999px;
+    padding: 9px 20px;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    color: #FCE9C0;
+  }
+  .hero h1 {
+    font-size: clamp(2.1rem, 7vw, 3.3rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -1px;
+    margin-bottom: 22px;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(90deg, #FCE9C0 0%, #F5D4A0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p {
+    font-size: 1rem;
+    opacity: .88;
+    max-width: 600px;
+    margin: 0 auto 38px;
+    line-height: 1.7;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+  .gstat {
+    background: rgba(255,243,220,.09);
+    border: 1px solid rgba(255,243,220,.24);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 22px;
+    padding: 26px 22px 22px;
+    text-align: center;
+    transition: transform .25s, background .25s;
+  }
+  .gstat:hover { transform: translateY(-2px); background: rgba(255,243,220,.14); }
+  .gstat-val {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.05;
+    color: #FCE9C0;
+  }
+  .gstat-lbl {
+    font-size: .85rem;
+    opacity: .85;
+    margin-top: 8px;
+    font-weight: 400;
+  }
+  .gstat.wide {
+    grid-column: 1 / -1;
+    max-width: 50%;
+    margin: 0 auto;
+    width: 100%;
+  }
+  @media(max-width: 480px) {
+    .gstat.wide { max-width: 100%; }
+    .gstat-val { font-size: 2rem; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     STICKY NAV
+  ═══════════════════════════════════════════════════════════ */
+  .nav-wrap {
+    background: rgba(250, 247, 242, .95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-tabs {
+    display: flex;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 14px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 14px 12px 4px;
+    font-weight: 700; font-size: .92rem;
+    color: var(--primary-dk);
+    border-right: 1px solid var(--border);
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .brand-icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #B89A6F 0%, #8B6F47 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px;
+    box-shadow: 0 4px 10px rgba(139, 111, 71, .25);
+  }
+  .tab-btn {
+    padding: 14px 13px;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--muted);
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: color .2s, border-color .2s;
+    font-family: inherit;
+  }
+  .tab-btn.active { color: var(--primary-dk); border-bottom-color: var(--primary); font-weight: 600; }
+  .tab-btn:hover { color: var(--primary-dk); }
+
+  /* ═══════════════════════════════════════════════════════════
+     CONTENT
+  ═══════════════════════════════════════════════════════════ */
+  .content { max-width: 1100px; margin: 0 auto; padding: 32px 18px 80px; }
+  .panel { display: none; animation: fadeIn .35s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .sec-h {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -.3px;
+    color: var(--primary-dk);
+  }
+  .sec-sub {
+    font-size: .9rem;
+    color: var(--muted);
+    margin-bottom: 22px;
+    line-height: 1.55;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     KPI CARDS
+  ═══════════════════════════════════════════════════════════ */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+  .kpi-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(60, 40, 20, .08); }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--primary);
+  }
+  .kpi-card.feed::before { background: var(--feed); }
+  .kpi-card.product::before { background: var(--product); }
+  .kpi-card.solvent::before { background: var(--solvent); }
+  .kpi-card.warn::before { background: var(--warn); }
+  .kpi-label {
+    font-size: .68rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .kpi-val {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -.5px;
+    line-height: 1.1;
+  }
+  .kpi-card.feed .kpi-val { color: var(--feed); }
+  .kpi-card.product .kpi-val { color: var(--product); }
+  .kpi-card.solvent .kpi-val { color: var(--solvent); }
+  .kpi-card.warn .kpi-val { color: var(--warn); }
+  .kpi-unit {
+    font-size: .76rem;
+    color: var(--muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .kpi-tag {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: .72rem;
+    font-weight: 600;
+    color: var(--green);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION CARDS
+  ═══════════════════════════════════════════════════════════ */
+  .section-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 14px;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .section-card:hover { box-shadow: 0 8px 28px rgba(60, 40, 20, .07); }
+
+  .sc-head {
+    display: flex; align-items: flex-start; gap: 14px;
+    margin-bottom: 12px;
+  }
+  .sc-icon {
+    width: 44px; height: 44px;
+    border-radius: 11px;
+    background: var(--primary-lt-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .sc-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.35;
+    padding-top: 9px;
+    letter-spacing: -.2px;
+    color: var(--primary-dk);
+  }
+  .sc-body {
+    font-size: .92rem;
+    color: #524740;
+    line-height: 1.65;
+  }
+  .sc-body b { color: var(--primary-dk); }
+
+  /* Callouts */
+  .callout {
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    display: flex; gap: 14px;
+    align-items: flex-start;
+    line-height: 1.6;
+    font-size: .9rem;
+  }
+  .callout-icon { font-size: 22px; flex-shrink: 0; margin-top: -2px; }
+  .callout.info  { background: var(--primary-lt-bg); border: 1px solid var(--border-dk); color: var(--primary-dk); }
+  .callout.warn  { background: #FFF8E6; border: 1px solid #F0DCA0; color: #6B5424; }
+  .callout.note  { background: var(--greenl);  border: 1px solid #C7D6A8; color: #3D5424; }
+  .callout.alert { background: #FBEAE5; border: 1px solid #E8B5A8; color: #7A2418; }
+  .callout b { font-weight: 700; }
+
+  /* ═══════════════════════════════════════════════════════════
+     CHART CARDS
+  ═══════════════════════════════════════════════════════════ */
+  .chart-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 22px 18px;
+    margin-bottom: 16px;
+  }
+  .chart-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .chart-title  { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -.2px; }
+  .chart-sub    { font-size: .8rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .badge {
+    font-size: .7rem; font-weight: 700;
+    padding: 4px 11px; border-radius: 999px;
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
+  .badge-primary { background: var(--primary-lt-bg); color: var(--primary-dk); }
+  .badge-win     { background: var(--greenl); color: #3D5424; }
+  .badge-warn    { background: #FFF1D0; color: #6B5424; }
+
+  .legend     { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; font-size: .78rem; color: var(--muted); }
+  .leg-item   { display: flex; align-items: center; gap: 6px; }
+  .leg-dot    { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+  .chart-wrap { position: relative; }
+  .two-col    { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ═══════════════════════════════════════════════════════════
+     TABLES
+  ═══════════════════════════════════════════════════════════ */
+  .data-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  .data-table th {
+    padding: 12px 14px; text-align: left;
+    background: var(--primary); color: white;
+    font-weight: 600; font-size: .78rem;
+    letter-spacing: .02em;
+  }
+  .data-table th:first-child { border-radius: 10px 0 0 0; }
+  .data-table th:last-child  { border-radius: 0 10px 0 0; }
+  .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); }
+  .data-table tr:nth-child(even) td { background: #FCFAF6; }
+  .data-table td.feed-cell    { font-weight: 600; color: var(--feed); }
+  .data-table td.product-cell { font-weight: 700; color: var(--product); background: var(--greenl) !important; }
+  .data-table td.solvent-cell { font-weight: 600; color: var(--solvent); }
+  .data-table td.num { font-variant-numeric: tabular-nums; text-align: right; }
+
+  .scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
+
+  /* ═══════════════════════════════════════════════════════════
+     PROCESS FLOW DIAGRAM
+  ═══════════════════════════════════════════════════════════ */
+  .pfd {
+    width: 100%;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FAF6EE 100%);
+    border-radius: 14px;
+    padding: 18px 12px;
+    border: 1px solid var(--border);
+  }
+  .pfd-svg { width: 100%; height: auto; display: block; }
+
+  /* Equation box */
+  .eq-box {
+    background: var(--primary-lt-bg);
+    border-left: 4px solid var(--primary);
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: .88rem;
+    color: var(--primary-dk);
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+  .eq-box b { font-family: -apple-system, sans-serif; font-weight: 700; }
+
+  /* Hazard / safeguard list */
+  .hz-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .hz-item {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--warn);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .hz-item .hz-h {
+    font-weight: 700; color: var(--warn);
+    font-size: .92rem; margin-bottom: 4px;
+  }
+  .hz-item .hz-cause { font-size: .82rem; color: var(--muted); margin-bottom: 8px; font-style: italic; }
+  .hz-item .hz-safe  { font-size: .87rem; color: var(--text); line-height: 1.55; }
+  .hz-item .hz-safe b { color: var(--primary-dk); }
+
+  /* References + contributions */
+  .ref-list { list-style: none; }
+  .ref-item { padding: 13px 0; border-bottom: 1px solid var(--border); display: flex; gap: 14px; }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-num  { font-weight: 700; color: var(--primary); font-size: .85rem; min-width: 28px; }
+  .ref-body { font-size: .85rem; color: var(--text); line-height: 1.6; flex: 1; }
+  .ref-body a { color: var(--primary); word-break: break-all; text-decoration: none; }
+  .ref-body a:hover { text-decoration: underline; }
+  .ref-section {
+    font-weight: 700; font-size: .72rem;
+    text-transform: uppercase; letter-spacing: .08em;
+    color: var(--muted); margin: 24px 0 8px;
+  }
+  .ref-section:first-of-type { margin-top: 0; }
+
+  /* Footer */
+  footer {
+    text-align: center; font-size: .78rem; color: var(--muted);
+    padding: 28px 20px; border-top: 1px solid var(--border);
+    background: white;
+  }
+  footer .ft-brand {
+    font-weight: 700; color: var(--primary-dk); margin-bottom: 4px;
+  }
+
+  /* Math/inline code */
+  .var { font-family: 'SF Mono', Menlo, monospace; background: var(--bg-alt); padding: 1px 6px; border-radius: 4px; font-size: .9em; color: var(--primary-dk); }
+
+  /* Stage indicator block */
+  .stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .stage-card {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FAF6EE 100%);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    position: relative;
+  }
+  .stage-card .sg-tag {
+    font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+  }
+  .stage-card .sg-val {
+    font-size: 1.55rem; font-weight: 800; color: var(--primary-dk);
+    letter-spacing: -.5px; line-height: 1.1; margin: 6px 0 4px;
+  }
+  .stage-card .sg-sub { font-size: .82rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-pill-top">CHE 306 · Process Design Project · 2026</div>
+    <h1>CO₂ Absorption from <span class="accent">Natural Gas</span> Using Amine Solvent</h1>
+    <p>An engineering design and analysis of a sour-gas sweetening unit using an aqueous MDEA / Sulfolane solvent system. Validated against Aspen HYSYS V14 with the Acid Gas — Chemical Solvents fluid package.</p>
+
+    <div class="hero-stats">
+      <div class="gstat">
+        <div class="gstat-val">45 → 2.94%</div>
+        <div class="gstat-lbl">CO₂ mol fraction reduction</div>
+      </div>
+      <div class="gstat">
+        <div class="gstat-val">~0%</div>
+        <div class="gstat-lbl">H₂S in sweet gas</div>
+      </div>
+      <div class="gstat">
+        <div class="gstat-val">30 / 25</div>
+        <div class="gstat-lbl">Absorber / stripper stages</div>
+      </div>
+      <div class="gstat">
+        <div class="gstat-val">&lt; 0.06%</div>
+        <div class="gstat-lbl">Mass balance closure error</div>
+      </div>
+      <div class="gstat wide">
+        <div class="gstat-val">~15 m</div>
+        <div class="gstat-lbl">Packed-bed height (both columns)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════════════════════ -->
+<div class="nav-wrap">
+  <div class="nav-tabs">
+    <div class="brand"><span class="brand-icon">⚗</span>CO₂ Absorption</div>
+    <button class="tab-btn active" onclick="showTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="showTab('process', this)">Process</button>
+    <button class="tab-btn" onclick="showTab('calculations', this)">Calculations</button>
+    <button class="tab-btn" onclick="showTab('validation', this)">Validation</button>
+    <button class="tab-btn" onclick="showTab('safety', this)">Safety</button>
+    <button class="tab-btn" onclick="showTab('refs', this)">References</button>
+    <button class="tab-btn" onclick="showTab('contrib', this)">Contributions</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL: OVERVIEW
+═══════════════════════════════════════════════════════════ -->
+<div id="panel-overview" class="panel active">
+
+  <div class="sec-h">At a glance — key process numbers</div>
+  <div class="sec-sub">A 30-stage absorber (T-101) and 25-stage reboiled stripper (T-103) treating 500 kmol/h of sour natural gas with aqueous MDEA / Sulfolane solvent.</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card feed">
+      <div class="kpi-label">Sour-gas feed flow</div>
+      <div class="kpi-val">500</div>
+      <div class="kpi-unit">kmol/h, 35 °C, 5,210 kPa</div>
+    </div>
+    <div class="kpi-card feed">
+      <div class="kpi-label">CO₂ in feed</div>
+      <div class="kpi-val">45%</div>
+      <div class="kpi-unit">mol fraction</div>
+    </div>
+    <div class="kpi-card feed">
+      <div class="kpi-label">H₂S in feed</div>
+      <div class="kpi-val">1%</div>
+      <div class="kpi-unit">mol fraction (sour service)</div>
+    </div>
+    <div class="kpi-card solvent">
+      <div class="kpi-label">Lean amine flow</div>
+      <div class="kpi-val">1,892</div>
+      <div class="kpi-unit">kmol/h, ~26 °C, 5,220 kPa</div>
+    </div>
+    <div class="kpi-card product">
+      <div class="kpi-label">Sweet-gas CO₂</div>
+      <div class="kpi-val">2.94%</div>
+      <div class="kpi-unit">mol fraction (pipeline-spec)</div>
+    </div>
+    <div class="kpi-card product">
+      <div class="kpi-label">Sweet-gas H₂S</div>
+      <div class="kpi-val">~0</div>
+      <div class="kpi-unit">essentially complete removal</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Absorber pressure</div>
+      <div class="kpi-val">5,200</div>
+      <div class="kpi-unit">kPa — high-pressure operation</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Stripper pressure</div>
+      <div class="kpi-val">500</div>
+      <div class="kpi-unit">kPa — reboiler at ~70 °C</div>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">⚗️</span>
+    <div><b>Solvent system —</b> Aqueous <b>MDEA + Sulfolane + H₂O</b> hybrid. MDEA provides selective chemical absorption with low regeneration energy; Sulfolane adds physical absorption capacity at the high CO₂ partial pressure of the feed. Together, this hybrid delivers the high removal performance needed for a 45 mol% CO₂ feed while keeping reboiler duty manageable.</div>
+  </div>
+
+  <div class="sec-h" style="margin-top:34px">Why this design — by metric</div>
+  <div class="sec-sub">Each card summarizes one outcome of the design study.</div>
+
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">🌿</div>
+      <div class="sc-title">Pipeline-quality sweet gas</div>
+    </div>
+    <p class="sc-body">The absorber reduces CO₂ from <b>45 mol% to 2.94 mol%</b> — at or below typical pipeline specifications — and brings H₂S to essentially zero. The result confirms the hybrid solvent's ability to handle a sour, high-CO₂ feed in a single absorption stage.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">⚖️</div>
+      <div class="sc-title">Mass balances close to within 0.06%</div>
+    </div>
+    <p class="sc-body">Independent hand calculations on a 500 kmol/h basis show molar and mass balance closure errors below <b>0.06%</b> for both the absorber (T-101) and stripper (T-103), confirming thermodynamic consistency between the simulation and the design model.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">🔥</div>
+      <div class="sc-title">Adiabatic absorber operation</div>
+    </div>
+    <p class="sc-body">Energy balance shows net duty <b>Q ≈ 0</b> on T-101. The exothermic CO₂ absorption heat (≈ 6.4 °C solvent temperature rise) is carried out by the rich-amine stream rather than removed by external cooling — consistent with how industrial amine absorbers actually run.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">📐</div>
+      <div class="sc-title">Stage counts match HYSYS exactly</div>
+    </div>
+    <p class="sc-body">Kremser shortcut analysis (on a solute-free basis) yields <b>~30 absorber stages</b> and <b>~25 stripper stages</b>, in exact agreement with the rigorous Aspen HYSYS V14 configuration. This cross-check supports the selected solvent rate and pressures.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">📏</div>
+      <div class="sc-title">~15 m packed-bed height</div>
+    </div>
+    <p class="sc-body">HTU/NTU analysis based on Sulzer Mellapak 250Y structured packing gives an estimated packed-bed height of approximately <b>15 m</b> for both columns — a reasonable preliminary value for an MDEA / Sulfolane gas-sweetening service.</p>
+  </div>
+
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">🛡️</div>
+      <div class="sc-title">Safety-aware preliminary design</div>
+    </div>
+    <p class="sc-body">A layered protection strategy is proposed for H₂S toxicity, CO₂ asphyxiation, methane flammability, wet-H₂S cracking, amine SCC, foaming, and overpressure — with fixed gas detection, sour-service materials, PSV / flare routing, ESD interlocks, and corrosion monitoring. A formal HAZOP is recommended before detailed engineering.</p>
+  </div>
+
+  <div class="callout warn" style="margin-top:24px">
+    <span class="callout-icon">📋</span>
+    <div><b>Note on Data —</b> Stream conditions, compositions, and enthalpies were generated in <b>Aspen HYSYS V14</b> using the <i>Acid Gas — Chemical Solvents</i> fluid package, then scaled to the design basis (500 kmol/h sour gas, 1,893 kmol/h lean amine). All hand-calculation results are checked against the rigorous simulation and against literature correlations for amine sweetening systems.</div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">🔑</span>
+    <div><b>Design Basis —</b> Steady-state, pipeline-spec sour-gas treating service. Effective equilibrium slopes (m = 6.945 absorber, m = 12.55 stripper) are back-fitted from the Aspen rigorous VLE so the Kremser shortcut matches the non-linear MDEA / Sulfolane equilibrium. The solute-free Kremser form is used because CO₂ feed concentration is high (45 mol%).</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL: PROCESS
+═══════════════════════════════════════════════════════════ -->
+<div id="panel-process" class="panel">
+
+  <div class="sec-h">Process flow diagram</div>
+  <div class="sec-sub">Sour gas enters the bottom of the absorber while lean amine enters the top. Rich amine is depressurised, heated, and regenerated in the reboiled stripper; the recovered lean amine is recycled.</div>
+
+  <div class="chart-card">
+    <div class="pfd">
+      <svg viewBox="0 0 980 360" xmlns="http://www.w3.org/2000/svg" class="pfd-svg" role="img" aria-label="Process flow diagram of CO2 absorption unit">
+        <defs>
+          <linearGradient id="absorberGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#B89A6F"/>
+            <stop offset="100%" stop-color="#5C4830"/>
+          </linearGradient>
+          <linearGradient id="stripperGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#C9A876"/>
+            <stop offset="100%" stop-color="#8B6F47"/>
+          </linearGradient>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#5C4830"/>
+          </marker>
+          <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6B8E4E"/>
+          </marker>
+          <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#A0522D"/>
+          </marker>
+        </defs>
+
+        <!-- Background grid -->
+        <rect x="0" y="0" width="980" height="360" fill="#FFFFFF"/>
+
+        <!-- ABSORBER T-101 -->
+        <rect x="170" y="60" width="100" height="220" rx="8" fill="url(#absorberGrad)" stroke="#5C4830" stroke-width="2"/>
+        <text x="220" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#5C4830">T-101</text>
+        <text x="220" y="170" text-anchor="middle" font-size="11" font-weight="600" fill="white">ABSORBER</text>
+        <text x="220" y="186" text-anchor="middle" font-size="10" fill="white" opacity="0.9">30 stages</text>
+        <text x="220" y="200" text-anchor="middle" font-size="10" fill="white" opacity="0.9">5,200 kPa</text>
+        <!-- packing lines -->
+        <line x1="180" y1="100" x2="260" y2="100" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="120" x2="260" y2="120" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="140" x2="260" y2="140" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="220" x2="260" y2="220" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="180" y1="240" x2="260" y2="240" stroke="white" stroke-width=".5" opacity=".4"/>
+
+        <!-- STRIPPER T-103 -->
+        <rect x="640" y="60" width="100" height="220" rx="8" fill="url(#stripperGrad)" stroke="#5C4830" stroke-width="2"/>
+        <text x="690" y="50" text-anchor="middle" font-size="13" font-weight="700" fill="#5C4830">T-103</text>
+        <text x="690" y="170" text-anchor="middle" font-size="11" font-weight="600" fill="white">STRIPPER</text>
+        <text x="690" y="186" text-anchor="middle" font-size="10" fill="white" opacity="0.9">25 stages</text>
+        <text x="690" y="200" text-anchor="middle" font-size="10" fill="white" opacity="0.9">500 kPa</text>
+        <line x1="650" y1="100" x2="730" y2="100" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="120" x2="730" y2="120" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="140" x2="730" y2="140" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="220" x2="730" y2="220" stroke="white" stroke-width=".5" opacity=".4"/>
+        <line x1="650" y1="240" x2="730" y2="240" stroke="white" stroke-width=".5" opacity=".4"/>
+
+        <!-- Reboiler -->
+        <circle cx="780" cy="295" r="22" fill="#C0392B" stroke="#7A2418" stroke-width="2"/>
+        <text x="780" y="299" text-anchor="middle" font-size="11" font-weight="700" fill="white">Q</text>
+        <text x="780" y="335" text-anchor="middle" font-size="10" font-weight="600" fill="#7A2418">Reboiler</text>
+        <line x1="740" y1="280" x2="760" y2="295" stroke="#5C4830" stroke-width="1.5"/>
+        <line x1="740" y1="270" x2="760" y2="290" stroke="#5C4830" stroke-width="1.5"/>
+
+        <!-- Lean/Rich heat exchanger -->
+        <rect x="385" y="200" width="80" height="44" rx="4" fill="#F5EDDD" stroke="#8B6F47" stroke-width="1.5"/>
+        <text x="425" y="218" text-anchor="middle" font-size="10" font-weight="700" fill="#5C4830">Lean/Rich</text>
+        <text x="425" y="232" text-anchor="middle" font-size="10" font-weight="600" fill="#5C4830">HX</text>
+
+        <!-- Flash drum -->
+        <ellipse cx="350" cy="155" rx="22" ry="14" fill="#F5EDDD" stroke="#8B6F47" stroke-width="1.5"/>
+        <text x="350" y="159" text-anchor="middle" font-size="9" font-weight="700" fill="#5C4830">Flash</text>
+
+        <!-- Sour gas in (bottom of absorber) -->
+        <line x1="60" y1="260" x2="170" y2="260" stroke="#A0522D" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+        <text x="115" y="252" text-anchor="middle" font-size="10" font-weight="600" fill="#A0522D">Sour Gas Feed</text>
+        <text x="115" y="276" text-anchor="middle" font-size="9" fill="#7A6F5E">500 kmol/h · 45% CO₂ · 1% H₂S</text>
+
+        <!-- Sweet gas out (top of absorber) -->
+        <line x1="220" y1="60" x2="220" y2="20" stroke="#6B8E4E" stroke-width="2.5" marker-end="url(#arrowGreen)"/>
+        <text x="232" y="40" font-size="10" font-weight="600" fill="#3D5424">Sweet Gas</text>
+        <text x="232" y="54" font-size="9" fill="#7A6F5E">CO₂ 2.94% · H₂S ≈ 0</text>
+
+        <!-- Lean amine in (top of absorber) -->
+        <line x1="270" y1="80" x2="320" y2="80" stroke="#B8860B" stroke-width="2"/>
+        <line x1="320" y1="80" x2="320" y2="20" stroke="#B8860B" stroke-width="2"/>
+        <text x="332" y="50" font-size="10" font-weight="600" fill="#8B6F0B">Lean Amine</text>
+        <text x="332" y="64" font-size="9" fill="#7A6F5E">1,892 kmol/h, 26 °C</text>
+
+        <!-- Rich amine path: absorber bottom -> flash -> HX -> stripper top -->
+        <line x1="270" y1="260" x2="320" y2="260" stroke="#A0522D" stroke-width="2.5"/>
+        <line x1="320" y1="260" x2="320" y2="155" stroke="#A0522D" stroke-width="2.5"/>
+        <line x1="320" y1="155" x2="328" y2="155" stroke="#A0522D" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+        <text x="295" y="280" text-anchor="middle" font-size="10" font-weight="600" fill="#A0522D">Rich Amine</text>
+        <line x1="372" y1="155" x2="425" y2="155" stroke="#A0522D" stroke-width="2.5"/>
+        <line x1="425" y1="155" x2="425" y2="200" stroke="#A0522D" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+        <line x1="465" y1="222" x2="540" y2="222" stroke="#A0522D" stroke-width="2.5"/>
+        <line x1="540" y1="222" x2="540" y2="100" stroke="#A0522D" stroke-width="2.5"/>
+        <line x1="540" y1="100" x2="640" y2="100" stroke="#A0522D" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+        <text x="595" y="92" text-anchor="middle" font-size="10" font-weight="600" fill="#A0522D">Rich Solvent</text>
+
+        <!-- CO2 product (top of stripper) -->
+        <line x1="690" y1="60" x2="690" y2="20" stroke="#A0522D" stroke-width="2.5" marker-end="url(#arrowRed)"/>
+        <text x="702" y="40" font-size="10" font-weight="600" fill="#A0522D">CO₂ Product</text>
+        <text x="702" y="54" font-size="9" fill="#7A6F5E">~97 kmol/h, 60% CO₂</text>
+
+        <!-- Lean amine recycle (bottom of stripper -> HX -> back to absorber top) -->
+        <line x1="740" y1="260" x2="900" y2="260" stroke="#B8860B" stroke-width="2"/>
+        <line x1="900" y1="260" x2="900" y2="222" stroke="#B8860B" stroke-width="2"/>
+        <line x1="900" y1="222" x2="465" y2="222" stroke="#B8860B" stroke-width="2"/>
+        <text x="820" y="280" text-anchor="middle" font-size="10" font-weight="600" fill="#8B6F0B">Lean Amine Recycle (1,893 kmol/h, 70 °C)</text>
+
+        <!-- Cooler indicator -->
+        <circle cx="385" cy="222" r="6" fill="#FFFFFF" stroke="#8B6F47" stroke-width="1.5"/>
+        <text x="385" y="226" text-anchor="middle" font-size="8" font-weight="700" fill="#5C4830">C</text>
+
+        <!-- T-103 reboiler input -->
+        <line x1="740" y1="280" x2="758" y2="285" stroke="#5C4830" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <p style="font-size:.78rem; color: var(--muted); margin-top: 10px; line-height: 1.6;">
+      <b>Key:</b> Sienna lines = sour / acid-gas streams · Sage = sweetened product · Goldenrod = amine streams. The lean/rich heat exchanger (HX) recovers heat from the regenerated lean amine to pre-heat the rich solvent before it enters the stripper.
+    </p>
+  </div>
+
+  <div class="sec-h" style="margin-top: 28px">Stream summary — T-101 absorber</div>
+  <div class="chart-card">
+    <div class="scroll-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Stream</th><th>Role</th><th>T (°C)</th><th>P (kPa)</th>
+            <th class="num">Molar (kmol/h)</th><th class="num">Mass (kg/h)</th><th>Vap. Frac.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Sour Gas Feed</b></td><td class="feed-cell">Inlet</td><td>35.00</td><td>5,210</td><td class="num">500.0</td><td class="num">14,580</td><td>1.000</td></tr>
+          <tr><td><b>Lean Amine</b></td><td class="solvent-cell">Inlet</td><td>26.03</td><td>5,220</td><td class="num">1,892</td><td class="num">180,600</td><td>0.000</td></tr>
+          <tr><td><b>Sweet Gas</b></td><td class="product-cell">Outlet (top)</td><td>26.18</td><td>5,150</td><td class="num">270.6</td><td class="num">4,722</td><td>1.000</td></tr>
+          <tr><td><b>Rich Amine</b></td><td class="feed-cell">Outlet (btm)</td><td>41.47</td><td>5,200</td><td class="num">2,121</td><td class="num">190,500</td><td>0.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:10px">Σ Molar In = 2,393 kmol/h · Σ Molar Out = 2,393 kmol/h · Σ Mass In = Σ Mass Out = 1.952 × 10⁵ kg/h ✓</p>
+  </div>
+
+  <div class="sec-h" style="margin-top: 28px">Stream composition — mole fractions</div>
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Component composition by stream</div>
+        <div class="chart-sub">From Aspen HYSYS V14 — Acid Gas / Chemical Solvents fluid package.</div>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height: 360px"><canvas id="compChart"></canvas></div>
+  </div>
+
+  <div class="two-col" style="margin-top: 16px">
+    <div class="chart-card">
+      <div class="chart-title">Composition (mol fraction) — full table</div>
+      <div class="scroll-wrap" style="margin-top: 10px">
+        <table class="data-table">
+          <thead>
+            <tr><th>Component</th><th class="num">Sour Gas</th><th class="num">Sweet Gas</th><th class="num">Rich Amine</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>CO₂</b></td><td class="num">0.4500</td><td class="num product-cell">0.0294</td><td class="num">0.1023</td></tr>
+            <tr><td><b>H₂S</b></td><td class="num">0.0100</td><td class="num product-cell">0.0000</td><td class="num">0.0024</td></tr>
+            <tr><td>Methane</td><td class="num">0.5200</td><td class="num">0.9368</td><td class="num">0.0031</td></tr>
+            <tr><td>Ethane</td><td class="num">0.0150</td><td class="num">0.0256</td><td class="num">0.0003</td></tr>
+            <tr><td>Propane</td><td class="num">0.0050</td><td class="num">0.0080</td><td class="num">0.0002</td></tr>
+            <tr><td>MDEAmine</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.3389</td></tr>
+            <tr><td>H₂O</td><td class="num">0.0000</td><td class="num">0.0002</td><td class="num">0.2122</td></tr>
+            <tr><td>Sulfolane</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.3398</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">CO₂ removal performance</div>
+      <div class="chart-sub" style="margin-bottom: 12px">CO₂ mol fraction across the absorber.</div>
+      <div class="chart-wrap" style="height: 280px"><canvas id="co2Chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL: CALCULATIONS
+═══════════════════════════════════════════════════════════ -->
+<div id="panel-calculations" class="panel">
+
+  <div class="sec-h">Design calculations summary</div>
+  <div class="sec-sub">Mass balances, energy balances, Kremser equilibrium-stage analysis, and HTU/NTU packed-bed sizing for both columns.</div>
+
+  <div class="stage-grid" style="margin-bottom: 18px">
+    <div class="stage-card">
+      <div class="sg-tag">T-101 Absorber</div>
+      <div class="sg-val">N = 30</div>
+      <div class="sg-sub">theoretical stages · A = 0.991</div>
+    </div>
+    <div class="stage-card">
+      <div class="sg-tag">T-103 Stripper</div>
+      <div class="sg-val">N = 25</div>
+      <div class="sg-sub">theoretical stages · S = 1.244</div>
+    </div>
+    <div class="stage-card">
+      <div class="sg-tag">Absorber NTU / HTU</div>
+      <div class="sg-val">30.2 / 0.50 m</div>
+      <div class="sg-sub">≈ 15.0 m packed bed</div>
+    </div>
+    <div class="stage-card">
+      <div class="sg-tag">Stripper NTU / HTU</div>
+      <div class="sg-val">22.4 / 0.67 m</div>
+      <div class="sg-sub">≈ 15.0 m packed bed</div>
+    </div>
+  </div>
+
+  <!-- Mass balance -->
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">⚖️</div>
+      <div class="sc-title">Mass balance — T-101 absorber</div>
+    </div>
+    <p class="sc-body">Steady-state, 30 theoretical stages, no accumulation. The rich-amine flow is calculated from the original HYSYS absorption ratio of 0.1445 kmol absorbed per kmol of lean amine.</p>
+    <div class="eq-box">
+      F<sub>Sour Gas</sub> + F<sub>Lean Amine</sub> = F<sub>Sweet Gas</sub> + F<sub>Rich Amine</sub><br>
+      500 + 1,893 = 226.4 + 2,166.6 = <b>2,393 kmol/h ✓</b>
+    </div>
+    <p class="sc-body">Closure is exact at the molar level and to within 0.06% on a mass basis — confirming consistency between the design and the simulation.</p>
+  </div>
+
+  <!-- Energy balance -->
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">🔥</div>
+      <div class="sc-title">Energy balance — T-101 (adiabatic)</div>
+    </div>
+    <p class="sc-body">Total enthalpy in = total enthalpy out at the new flow rates. Net column duty is essentially zero — the exothermic CO₂ absorption heat (~6.4 °C solvent rise) is carried out by the rich-amine stream rather than removed by external cooling.</p>
+    <div class="eq-box">
+      ΣH<sub>in</sub>  = −8.839 × 10⁸ kJ/h<br>
+      ΣH<sub>out</sub> = −8.839 × 10⁸ kJ/h<br>
+      Q<sub>abs</sub> = ΣH<sub>out</sub> − ΣH<sub>in</sub> ≈ <b>0 kJ/h  →  adiabatic ✓</b>
+    </div>
+  </div>
+
+  <!-- Kremser absorber -->
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">📐</div>
+      <div class="sc-title">Kremser equation — absorber stages</div>
+    </div>
+    <p class="sc-body">Because CO₂ is at high concentration (45 mol%), Kremser is applied on a <b>solute-free basis</b> with mole ratios <span class="var">Y = y/(1−y)</span>. The effective equilibrium slope <span class="var">m = 6.945</span> is back-fitted from Aspen's rigorous VLE.</p>
+    <div class="eq-box">
+      Y<sub>N+1</sub> = 0.45 / 0.55 = 0.8182 mol CO₂/mol dry gas<br>
+      Y<sub>1</sub>   = 0.0294 / 0.9706 = 0.03029<br>
+      V<sub>s</sub>   = 500 × (1 − 0.45) = 275 kmol/h<br>
+      A      = L / (m × V<sub>s</sub>) = 1,892 / (6.945 × 275) = <b>0.9906</b><br>
+      <br>
+      Solve Kremser ⇒ <b>N ≈ 30 theoretical stages ✓</b> (matches HYSYS exactly)
+    </div>
+    <p class="sc-body">The absorption factor A ≈ 1 indicates the solvent rate is operating just above the theoretical minimum, which maximises driving force per stage but leaves limited margin against operational upsets.</p>
+  </div>
+
+  <!-- Kremser stripper -->
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">♨️</div>
+      <div class="sc-title">Kremser equation — stripper stages</div>
+    </div>
+    <p class="sc-body">The stripper uses an apparent equilibrium slope <span class="var">m = 12.55</span> reflecting the steep CO₂ desorption curve. To keep the calculation physically valid, x<sub>out</sub> = 0.00005 (the actual non-rounded Aspen value) is used instead of Aspen's displayed 0.0000.</p>
+    <div class="eq-box">
+      S = m·V/L = (12.55 × 200) / 2,018 = <b>1.244</b><br>
+      x<sub>in</sub>/x<sub>out</sub> = 0.0599 / 0.00005 = 1,198<br>
+      <br>
+      N = ln[1 + (S − 1)(x<sub>in</sub>/x<sub>out</sub>)] / ln(S)  −  1<br>
+      N = ln(293.3) / ln(1.244) − 1 = 5.682 / 0.2183 − 1 = <b>≈ 25 ✓</b>
+    </div>
+    <p class="sc-body">S &gt; 1 confirms that the vapour phase is the favoured phase for CO₂ — stripping conditions are correctly driving CO₂ out of the rich solvent.</p>
+  </div>
+
+  <!-- HTU/NTU -->
+  <div class="section-card">
+    <div class="sc-head">
+      <div class="sc-icon">📏</div>
+      <div class="sc-title">HTU / NTU — column heights</div>
+    </div>
+    <p class="sc-body">Using Sulzer Mellapak 250Y structured packing with HETP ≈ 0.50 m/stage (absorber) and 0.60 m/stage (stripper):</p>
+    <div class="eq-box">
+      Absorber:  NTU<sub>OG</sub> ≈ 30.2,  HTU<sub>OG</sub> ≈ 0.497 m  →  H ≈ <b>15.0 m</b><br>
+      Stripper:  NTU<sub>OL</sub> ≈ 22.4,  HTU<sub>OL</sub> ≈ 0.671 m  →  H ≈ <b>15.0 m</b>
+    </div>
+    <p class="sc-body">Both columns converge to ~15 m — a reasonable preliminary value for an MDEA / Sulfolane gas-sweetening service. Final design must include flooding, pressure drop, vendor packing data, and a rate-based simulation check.</p>
+  </div>
+
+  <!-- Summary chart -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Stage / NTU / HTU summary</div>
+        <div class="chart-sub">Side-by-side comparison of absorber vs stripper design parameters.</div>
+      </div>
+      <span class="badge badge-primary">Design summary</span>
+    </div>
+    <div class="chart-wrap" style="height: 280px"><canvas id="stageChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL: VALIDATION
+═══════════════════════════════════════════════════════════ -->
+<div id="panel-validation" class="panel">
+
+  <div class="sec-h">Validation against Aspen HYSYS V14</div>
+  <div class="sec-sub">Hand-calculation results compared against the rigorous Acid Gas — Chemical Solvents fluid package simulation.</div>
+
+  <div class="callout note">
+    <span class="callout-icon">✅</span>
+    <div><b>Result —</b> Across composition, mass balance, energy balance, and stage count, the design model agrees with the rigorous simulation to within rounding error. Mass balance errors are below <b>0.06%</b>, and Kremser stage counts match HYSYS exactly for both columns.</div>
+  </div>
+
+  <!-- Sweet gas comparison -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Sweet gas composition — Hand calc vs HYSYS</div>
+        <div class="chart-sub">Absolute error per component. All components within ≤ 0.001 mol fraction.</div>
+      </div>
+      <span class="badge badge-win">Excellent agreement</span>
+    </div>
+    <div class="scroll-wrap" style="margin-top: 10px">
+      <table class="data-table">
+        <thead>
+          <tr><th>Component</th><th class="num">HYSYS x</th><th class="num">Hand calc x</th><th class="num">|Error|</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>CO₂</b></td><td class="num">0.0294</td><td class="num">0.0300</td><td class="num">0.0006</td><td>✔ Excellent</td></tr>
+          <tr><td>H₂S</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+          <tr><td>Ethane</td><td class="num">0.0256</td><td class="num">0.0260</td><td class="num">0.0004</td><td>✔ Excellent</td></tr>
+          <tr><td>Methane</td><td class="num">0.9368</td><td class="num">0.9360</td><td class="num">0.0008</td><td>✔ Excellent</td></tr>
+          <tr><td>Propane</td><td class="num">0.0080</td><td class="num">0.0080</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+          <tr><td>MDEAmine</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+          <tr><td>H₂O</td><td class="num">0.0002</td><td class="num">0.0000</td><td class="num">0.0002</td><td>✔ Excellent</td></tr>
+          <tr><td>Sulfolane</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CO2 product comparison -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">CO₂ product (stripper overhead) — Hand calc vs HYSYS</div>
+        <div class="chart-sub">Absolute error per component. CO₂ and H₂O within 0.005 mol fraction.</div>
+      </div>
+      <span class="badge badge-win">Good agreement</span>
+    </div>
+    <div class="scroll-wrap" style="margin-top: 10px">
+      <table class="data-table">
+        <thead>
+          <tr><th>Component</th><th class="num">HYSYS x</th><th class="num">Hand calc x</th><th class="num">|Error|</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>CO₂</b></td><td class="num">0.6048</td><td class="num">0.6000</td><td class="num">0.0048</td><td>✔ Good</td></tr>
+          <tr><td>H₂S</td><td class="num">0.0243</td><td class="num">0.0250</td><td class="num">0.0007</td><td>✔ Excellent</td></tr>
+          <tr><td>H₂O</td><td class="num">0.3698</td><td class="num">0.3741</td><td class="num">0.0043</td><td>✔ Good</td></tr>
+          <tr><td>Methane</td><td class="num">0.0005</td><td class="num">0.0005</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+          <tr><td>Ethane</td><td class="num">0.0002</td><td class="num">0.0002</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+          <tr><td>Propane</td><td class="num">0.0002</td><td class="num">0.0002</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+          <tr><td>MDEAmine</td><td class="num">0.0002</td><td class="num">0.0000</td><td class="num">0.0002</td><td>✔ Excellent</td></tr>
+          <tr><td>Sulfolane</td><td class="num">0.0000</td><td class="num">0.0000</td><td class="num">0.0000</td><td>✔ Excellent</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Validation chart -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Hand-calc vs HYSYS — sweet gas error per component</div>
+        <div class="chart-sub">Absolute error in mol fraction. All bars below 0.001 = pipeline-grade agreement.</div>
+      </div>
+      <span class="badge badge-win">All within tolerance</span>
+    </div>
+    <div class="chart-wrap" style="height: 260px"><canvas id="errorChart"></canvas></div>
+  </div>
+
+  <!-- Stage match -->
+  <div class="two-col" style="margin-top: 16px">
+    <div class="chart-card">
+      <div class="chart-title">Method comparison — absorber</div>
+      <div class="scroll-wrap" style="margin-top: 10px">
+        <table class="data-table">
+          <thead><tr><th>Method</th><th class="num">N</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Kremser (m = 6.945, solute-free)</td><td class="num">~30</td><td>✔ matches</td></tr>
+            <tr><td>Aspen HYSYS rigorous</td><td class="num">30</td><td>Reference</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Method comparison — stripper</div>
+      <div class="scroll-wrap" style="margin-top: 10px">
+        <table class="data-table">
+          <thead><tr><th>Method</th><th class="num">N</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Kremser (m = 12.55)</td><td class="num">~25</td><td>✔ matches</td></tr>
+            <tr><td>Aspen HYSYS rigorous</td><td class="num">25</td><td>Reference</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warn" style="margin-top: 14px">
+    <span class="callout-icon">⚠️</span>
+    <div><b>Caveat —</b> The Kremser shortcut uses simplified, fitted equilibrium slopes back-calculated from Aspen, while the rigorous simulation includes non-ideal thermodynamics, chemical kinetics, and multicomponent effects. The agreement here is best interpreted as a <b>shortcut design check</b>, not an independent rigorous validation. A rate-based simulation is still recommended before detailed engineering.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL: SAFETY
+═══════════════════════════════════════════════════════════ -->
+<div id="panel-safety" class="panel">
+
+  <div class="sec-h">Safety evaluation &amp; layered protection</div>
+  <div class="sec-sub">High-pressure sour service introduces toxicity, asphyxiation, flammability, corrosion, and process-upset hazards. The design uses a layered protection strategy — inherent safety, BPCS, alarms, SIS, relief, gas detection, and emergency response.</div>
+
+  <div class="callout alert">
+    <span class="callout-icon">⚠️</span>
+    <div><b>Hazardous service —</b> The unit handles 1 mol% H₂S at 5,200 kPa, where leak partial pressure can rapidly produce IDLH atmospheres (NIOSH IDLH = 100 ppm; OSHA ceiling = 20 ppm). Olfactory fatigue makes smell unreliable as a warning. This unit must be treated as <b>H₂S service</b> with fixed gas detection and permit-to-work for all maintenance.</div>
+  </div>
+
+  <div class="sec-h" style="margin-top: 24px">Hazards &amp; engineered safeguards</div>
+  <div class="sec-sub">Each hazard is paired with the recommended preventive and protective layers.</div>
+
+  <div class="hz-grid">
+    <div class="hz-item">
+      <div class="hz-h">☠️ H₂S toxic release</div>
+      <div class="hz-cause">Leak from absorber, flash drum, stripper overhead, sample point, or rich-amine line</div>
+      <div class="hz-safe"><b>Safeguards:</b> Fixed H₂S detectors (10 ppm low / 20 ppm high alarm) at all leak-credible locations · portable detectors for field work · permit-to-work · escape SCBA · closed sampling · vent routing to a safe flare.</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">😶‍🌫️ CO₂ asphyxiation</div>
+      <div class="hz-cause">CO₂-rich vent or leak displacing oxygen in enclosed / low-lying areas</div>
+      <div class="hz-safe"><b>Safeguards:</b> Stripper overhead routed to a safe elevated stack with adequate dispersion · oxygen-deficiency monitoring in nearby enclosed areas.</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">🔥 Methane fire / explosion</div>
+      <div class="hz-cause">Sweet-gas leak mixing with air within the flammable range</div>
+      <div class="hz-safe"><b>Safeguards:</b> Hydrocarbon gas detectors · hazardous-area electrical classification · ignition-source control · grounding &amp; bonding · nitrogen purging at start-up / shutdown.</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">🧱 Sulfide stress cracking / HIC</div>
+      <div class="hz-cause">Wet H₂S exposure causing hydrogen damage near welds (cf. Union Oil Romeoville rupture, OSHA 1986)</div>
+      <div class="hz-safe"><b>Safeguards:</b> Sour-service material selection · HIC-resistant plate where required · post-weld heat treatment (PWHT) · hardness control · periodic weld inspection.</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">🧪 Amine stress corrosion cracking</div>
+      <div class="hz-cause">Hot lean amine + residual weld stress (Bagdasarian, Shargay &amp; Coombs 1992)</div>
+      <div class="hz-safe"><b>Safeguards:</b> Stress-relieved welds in lean-amine and stripper service · lean-amine temperature control · inspection of hot-amine circuits.</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">💧 Erosion-corrosion at rich-amine letdown</div>
+      <div class="hz-cause">Two-phase flashing flow after pressure reduction (Nielsen &amp; Lewis 1995)</div>
+      <div class="hz-safe"><b>Safeguards:</b> Stainless / hard-faced valve trim · velocity control downstream · corrosion monitoring · scheduled inspection of letdown piping.</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">🫧 Foaming &amp; amine carryover</div>
+      <div class="hz-cause">Hydrocarbon contamination, FeS solids, degradation products, or heat-stable salts</div>
+      <div class="hz-safe"><b>Safeguards:</b> Inlet separation · coalescing filtration · routine solvent analysis · high-DP alarms across packed beds · controlled antifoam injection (root-cause action, not permanent fix).</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">⬆️ Gas blow-by to flash drum</div>
+      <div class="hz-cause">Loss of absorber bottom liquid level exposing the flash drum to absorber pressure</div>
+      <div class="hz-safe"><b>Safeguards:</b> Low-low level interlock · PSV sized for gas blow-by case · relief routed to a closed flare per API 521 (no atmospheric venting because of H₂S).</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">🔥 Reboiler overheating</div>
+      <div class="hz-cause">Loss of rich-amine feed flow while steam continues to the reboiler</div>
+      <div class="hz-safe"><b>Safeguards:</b> Fail-closed steam valve · low-low rich-amine flow trip · low-low stripper level trip · high reboiler temperature trip.</div>
+    </div>
+    <div class="hz-item">
+      <div class="hz-h">🚨 Acid-gas breakthrough</div>
+      <div class="hz-cause">Loss of lean-amine circulation while sour gas continues to enter</div>
+      <div class="hz-safe"><b>Safeguards:</b> Low-low lean-amine flow interlock that closes the sour-gas inlet ESD valve. Treated as safety-related; SIL determined by formal LOPA per IEC 61511.</div>
+    </div>
+  </div>
+
+  <div class="sec-h" style="margin-top: 30px">Layered protection strategy</div>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Layer 1</div><div class="kpi-val">🌱</div><div class="kpi-unit">Inherent safety — minimise inventory, avoid dead legs, low-degradation solvent</div></div>
+    <div class="kpi-card"><div class="kpi-label">Layer 2</div><div class="kpi-val">🎛️</div><div class="kpi-unit">Basic process control — pressure, level, flow, temperature</div></div>
+    <div class="kpi-card"><div class="kpi-label">Layer 3</div><div class="kpi-val">🔔</div><div class="kpi-unit">Alarms &amp; operator response</div></div>
+    <div class="kpi-card"><div class="kpi-label">Layer 4</div><div class="kpi-val">🛑</div><div class="kpi-unit">Safety-instrumented system — ESD interlocks</div></div>
+    <div class="kpi-card"><div class="kpi-label">Layer 5</div><div class="kpi-val">🚿</div><div class="kpi-unit">Pressure relief &amp; closed flare routing (API 521)</div></div>
+    <div class="kpi-card"><div class="kpi-label">Layer 6</div><div class="kpi-val">🚒</div><div class="kpi-unit">Gas detection, fire protection, emergency response</div></div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">📋</span>
+    <div><b>Recommendation —</b> A formal <b>HAZOP</b> and <b>LOPA</b> should be completed before detailed engineering and procurement, per IEC 61511. Inspection program: baseline UT thickness, periodic weld inspection, corrosion coupons in rich-amine service, solvent analysis for heat-stable salts, and inspection of high-risk locations (rich-amine letdown, lean/rich exchanger, absorber and stripper bottoms, reboiler).</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL: REFERENCES
+═══════════════════════════════════════════════════════════ -->
+<div id="panel-refs" class="panel">
+  <div class="sec-h">References</div>
+  <div class="sec-sub">Sources include peer-reviewed studies, regulatory standards, textbook references, and process simulation documentation.</div>
+
+  <div class="chart-card">
+    <div class="ref-section">Process simulation &amp; design</div>
+    <ul class="ref-list">
+      <li class="ref-item"><span class="ref-num">[1]</span><div class="ref-body">Aspen Technology, Inc. (2023). <em>Aspen HYSYS V14 — Acid Gas / Chemical Solvents fluid package documentation.</em> AspenTech.</div></li>
+      <li class="ref-item"><span class="ref-num">[2]</span><div class="ref-body">Kidnay, A. J., Parrish, W. R., &amp; McCartney, D. G. (2011). <em>Fundamentals of Natural Gas Processing</em> (2nd ed.). CRC Press.</div></li>
+      <li class="ref-item"><span class="ref-num">[3]</span><div class="ref-body">Kohl, A. L., &amp; Nielsen, R. B. (1997). <em>Gas Purification</em> (5th ed.). Gulf Publishing Company.</div></li>
+      <li class="ref-item"><span class="ref-num">[4]</span><div class="ref-body">Seader, J. D., Henley, E. J., &amp; Roper, D. K. (2011). <em>Separation Process Principles</em> (3rd ed.). John Wiley &amp; Sons.</div></li>
+      <li class="ref-item"><span class="ref-num">[5]</span><div class="ref-body">Kremser, A. (1930). Theoretical number of theoretical plates required for separation. <em>National Petroleum News, 22</em>(21), 43–49.</div></li>
+    </ul>
+
+    <div class="ref-section">Solvent &amp; absorption literature</div>
+    <ul class="ref-list">
+      <li class="ref-item"><span class="ref-num">[6]</span><div class="ref-body">Farooqi, A. S., Ramli, R. M., Lock, S. S. M., et al. (2023). Absorption of acid gases (CO₂, H₂S) from natural gas using a ternary blend of MDEA, AMP, and Sulfolane. <em>Materials Research Proceedings</em>, 29, 9–16.<br><a href="https://doi.org/10.21741/9781644902516-2" target="_blank">https://doi.org/10.21741/9781644902516-2</a></div></li>
+      <li class="ref-item"><span class="ref-num">[7]</span><div class="ref-body">Nejat, T., Movasati, A., Wood, D. A., &amp; Ghanbarabadi, H. (2018). Simulated exergy and energy performance comparison of physical-chemical and chemical solvents in a sour gas treatment plant. <em>Chemical Engineering Research and Design, 133</em>, 40–54.</div></li>
+      <li class="ref-item"><span class="ref-num">[8]</span><div class="ref-body">Ghanbarabadi, H., &amp; Khoshandam, B. (2015). Simulation and comparison of Sulfinol solvent performance with amine solvents. <em>Journal of Natural Gas Science and Engineering, 22</em>, 415–420.</div></li>
+      <li class="ref-item"><span class="ref-num">[9]</span><div class="ref-body">Sarker, N. K. (2016). Theoretical effect of concentration, circulation rate, stages, pressure and temperature of amine solvents on gas sweetening performance. <em>Egyptian Journal of Petroleum, 25</em>(3), 343–354.</div></li>
+      <li class="ref-item"><span class="ref-num">[10]</span><div class="ref-body">Zoghi, A. T., Feyzi, F., &amp; Zarrinpashneh, S. (2012). Effect of amine activators on the rate of CO₂ absorption in MDEA. <em>International Journal of Greenhouse Gas Control, 7</em>, 12–19.</div></li>
+    </ul>
+
+    <div class="ref-section">Safety, corrosion &amp; failure analysis</div>
+    <ul class="ref-list">
+      <li class="ref-item"><span class="ref-num">[11]</span><div class="ref-body">Bagdasarian, A. J., Shargay, C. A., &amp; Coombs, J. (1992). Survey updates amine stress corrosion cracking data. <em>Oil &amp; Gas Journal, 90</em>(2), 51–57.</div></li>
+      <li class="ref-item"><span class="ref-num">[12]</span><div class="ref-body">Stewart, E. J., &amp; Lanning, R. A. (2015). Trends in tragedy: An in-depth study of amine system failures. <em>Proc. 65th Laurance Reid Gas Conditioning Conference</em>, University of Oklahoma.</div></li>
+      <li class="ref-item"><span class="ref-num">[13]</span><div class="ref-body">Krzemień, A. (2016). Assessing the risk of corrosion in amine-based CO₂ capture process. <em>Journal of Loss Prevention in the Process Industries, 43</em>, 189–197.</div></li>
+      <li class="ref-item"><span class="ref-num">[14]</span><div class="ref-body">Polasek, J., Bullin, J. A., &amp; Donnelly, S. T. (1997). Acid-gas breakout and corrosion in amine treating units. <em>Bryan Research &amp; Engineering Technical Paper</em>.</div></li>
+      <li class="ref-item"><span class="ref-num">[15]</span><div class="ref-body">National Institute for Occupational Safety and Health. (2019). <em>NIOSH pocket guide to chemical hazards: Hydrogen sulfide</em>. DHHS-NIOSH Pub. No. 2005-149.<br><a href="https://www.cdc.gov/niosh/npg/npgd0337.html" target="_blank">https://www.cdc.gov/niosh/npg/npgd0337.html</a></div></li>
+      <li class="ref-item"><span class="ref-num">[16]</span><div class="ref-body">Occupational Safety and Health Administration (1986). <em>Phillips 66 Company Houston Chemical Complex Explosion and Fire</em> — and earlier Union Oil Romeoville absorber rupture incident report.</div></li>
+      <li class="ref-item"><span class="ref-num">[17]</span><div class="ref-body">Nielsen, R. B., &amp; Lewis, K. R. (1995). Corrosion in refinery amine systems. <em>NACE CORROSION 1995</em>.</div></li>
+      <li class="ref-item"><span class="ref-num">[18]</span><div class="ref-body">Vysus Group (2021). Heat-stable salt management in amine systems. Technical bulletin.</div></li>
+      <li class="ref-item"><span class="ref-num">[19]</span><div class="ref-body">API Standard 521 — <em>Pressure-relieving and Depressuring Systems</em>. American Petroleum Institute.</div></li>
+      <li class="ref-item"><span class="ref-num">[20]</span><div class="ref-body">IEC 61511 — <em>Functional safety: Safety instrumented systems for the process industry sector.</em> International Electrotechnical Commission.</div></li>
+    </ul>
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">📋</span>
+    <div><b>Note on scope —</b> This website summarises a CHE 306 preliminary engineering design project. It is not a final commercial feasibility study. Material selection, relief sizing, HAZOP, LOPA, and rate-based simulation must be completed in detailed engineering before the unit is approved for construction.</div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">🎯</span>
+    <div><b>Conclusion —</b> The proposed MDEA / Sulfolane absorption unit is technically feasible within the project scope. CO₂ is reduced from 45 mol% to 2.94 mol%, H₂S to essentially zero, mass and energy balances are consistent, Kremser shortcut and HYSYS rigorous results agree on stage count, and HTU/NTU gives a reasonable ~15 m packed bed. With rate-based validation, economic optimisation, and detailed HAZOP/LOPA, the unit can be designed for safe, effective sour natural gas sweetening.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL: CONTRIBUTIONS
+═══════════════════════════════════════════════════════════ -->
+<div id="panel-contrib" class="panel">
+  <div class="sec-h">Project contributors</div>
+  <div class="sec-sub">CHE 306 design project · King Fahd University of Petroleum &amp; Minerals · 2026</div>
+
+  <div class="chart-card">
+    <div class="ref-section">Project team</div>
+    <ul class="ref-list">
+      <li class="ref-item">
+        <div class="ref-body">
+          <b>Nawaf Alzahrani</b><br>
+          <a href="https://www.linkedin.com/in/nawaf-alzahrani-2ab194285?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_ios" target="_blank">LinkedIn profile</a>
+        </div>
+      </li>
+      <li class="ref-item">
+        <div class="ref-body">
+          <b>Ali Alyami</b><br>
+          <a href="https://www.linkedin.com/in/ali-alyami-222aa3380?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_" target="_blank">LinkedIn profile</a>
+        </div>
+      </li>
+      <li class="ref-item">
+        <div class="ref-body">
+          <b>Hatim Aljohani</b><br>
+          <a href="https://www.linkedin.com/in/hatim-aljohani-424a39319?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_ios" target="_blank">LinkedIn profile</a>
+        </div>
+      </li>
+      <li class="ref-item">
+        <div class="ref-body">
+          <b>Saleh Alloqman</b><br>
+          <a href="https://www.linkedin.com/in/saleh-alloqman-343064331?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_ios" target="_blank">LinkedIn profile</a>
+        </div>
+      </li>
+    </ul>
+
+    <div class="ref-section">Supervised by</div>
+    <ul class="ref-list">
+      <li class="ref-item">
+        <div class="ref-body">
+          <b>Dr. Abdallah Al-Shammari</b><br>
+          <a href="https://www.linkedin.com/in/abdallah-al-shammari-875b7791?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_ios" target="_blank">LinkedIn profile</a>
+        </div>
+      </li>
+      <li class="ref-item">
+        <div class="ref-body">
+          <b>Dr. Basim Abussaud</b><br>
+          <a href="https://www.linkedin.com/in/basim-abussaud-ph-d-4b696368?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_ios" target="_blank">LinkedIn profile</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<footer>
+  <div class="ft-brand">CO₂ Absorption from Natural Gas Using Amine Solvent — CHE 306 Design Project</div>
+  Aqueous MDEA / Sulfolane · 30-stage absorber + 25-stage stripper · Validated against Aspen HYSYS V14 (Acid Gas — Chemical Solvents)
+</footer>
+
+<script>
+const COL = {
+  primary:  '#8B6F47',
+  primaryD: '#5C4830',
+  primaryL: '#B89A6F',
+  feed:     '#A0522D',
+  product:  '#6B8E4E',
+  solvent:  '#B8860B',
+  warn:     '#C0392B',
+  accent:   '#C9A876'
+};
+
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  (btn || event.target).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+const baseOpts = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 14, boxWidth: 12 } } }
+};
+
+/* === Composition stacked bar === */
+const compCtx = document.getElementById('compChart');
+if (compCtx) {
+  new Chart(compCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Sour Gas Feed', 'Sweet Gas (out)', 'Rich Amine (out)'],
+      datasets: [
+        { label: 'CO₂',      data: [45.0, 2.94, 10.23], backgroundColor: COL.feed,    borderRadius: 4 },
+        { label: 'H₂S',      data: [1.0,  0.0,  0.24],  backgroundColor: COL.warn,    borderRadius: 4 },
+        { label: 'Methane',  data: [52.0, 93.68, 0.31], backgroundColor: COL.product, borderRadius: 4 },
+        { label: 'Ethane',   data: [1.5,  2.56,  0.03], backgroundColor: COL.primaryL,borderRadius: 4 },
+        { label: 'Propane',  data: [0.5,  0.80,  0.02], backgroundColor: COL.accent,  borderRadius: 4 },
+        { label: 'MDEA',     data: [0,    0,    33.89], backgroundColor: COL.solvent, borderRadius: 4 },
+        { label: 'H₂O',      data: [0,    0.02, 21.22], backgroundColor: '#7AAFC9',   borderRadius: 4 },
+        { label: 'Sulfolane',data: [0,    0,    33.98], backgroundColor: COL.primaryD,borderRadius: 4 }
+      ]
+    },
+    options: {
+      ...baseOpts,
+      scales: {
+        x: { stacked: true, grid: { display: false } },
+        y: { stacked: true, max: 100, ticks: { callback: v => v + '%' }, title: { display: true, text: 'mol fraction (%)' } }
+      },
+      plugins: {
+        ...baseOpts.plugins,
+        tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y.toFixed(2)}%` } }
+      }
+    }
+  });
+}
+
+/* === CO2 reduction bar === */
+const co2Ctx = document.getElementById('co2Chart');
+if (co2Ctx) {
+  new Chart(co2Ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Sour Gas Feed', 'Rich Amine', 'Sweet Gas Product'],
+      datasets: [{
+        label: 'CO₂ mol fraction (%)',
+        data: [45.0, 10.23, 2.94],
+        backgroundColor: [COL.feed, COL.solvent, COL.product],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      ...baseOpts,
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.x + '%' } } },
+      scales: {
+        x: { title: { display: true, text: 'CO₂ mol fraction (%)' }, ticks: { callback: v => v + '%' } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+/* === Stage / NTU / HTU summary === */
+const stageCtx = document.getElementById('stageChart');
+if (stageCtx) {
+  new Chart(stageCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Theoretical stages (N)', 'NTU', 'Column height (m)'],
+      datasets: [
+        { label: 'T-101 Absorber', data: [30, 30.2, 15.0], backgroundColor: COL.primary,  borderRadius: 6 },
+        { label: 'T-103 Stripper', data: [25, 22.4, 15.0], backgroundColor: COL.solvent, borderRadius: 6 }
+      ]
+    },
+    options: {
+      ...baseOpts,
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+/* === Validation error chart === */
+const errCtx = document.getElementById('errorChart');
+if (errCtx) {
+  new Chart(errCtx, {
+    type: 'bar',
+    data: {
+      labels: ['CO₂','H₂S','Ethane','Methane','Propane','MDEA','H₂O','Sulfolane'],
+      datasets: [{
+        label: 'Absolute error (mol fraction)',
+        data: [0.0006, 0.0000, 0.0004, 0.0008, 0.0000, 0.0000, 0.0002, 0.0000],
+        backgroundColor: COL.product,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      ...baseOpts,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => '|err| = ' + c.parsed.y.toFixed(4) } } },
+      scales: {
+        y: { beginAtZero: true, max: 0.001, title: { display: true, text: '|error| (mol fraction)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
